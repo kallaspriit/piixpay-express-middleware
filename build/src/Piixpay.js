@@ -47,13 +47,6 @@ var axios_1 = require("axios");
 var querystring = require("querystring");
 var ts_log_1 = require("ts-log");
 /**
- * Parameters for creating an invoice.
- */
-// export interface ICreateInvoiceInfo {
-//   dueAmount: number;
-//   message: string;
-// }
-/**
  * Supported request methods.
  */
 var RequestMethod;
@@ -107,13 +100,6 @@ var InvoiceStatus;
  * See https://piixpay.com/apidoc/index.html for API documentation.
  */
 var Piixpay = /** @class */ (function () {
-    // private isLoggedIn = false;
-    // private sessionKey?: string;
-    // private merchantKey?: string;
-    // private permissions = {
-    //   pos: false,
-    //   settle: false,
-    // };
     /**
      * Constructor.
      *
@@ -139,27 +125,6 @@ var Piixpay = /** @class */ (function () {
         var keys = Object.keys(InvoiceStatus);
         return keys.find(function (statusKey) { return InvoiceStatus[statusKey] === statusValue; });
     };
-    // public async login(): Promise<ILoginResponse> {
-    //   const response = await this.post<ILoginResponse>("/auth/login", {
-    //     username: this.config.username,
-    //     password: this.config.password,
-    //     permanent: false,
-    //   });
-    //   if (!response.ok) {
-    //     throw new Error(`Login failed (${response.error} - ${response.desc})`);
-    //   }
-    //   this.isLoggedIn = true;
-    //   this.sessionKey = response.session_key;
-    //   this.merchantKey = response.merchant_key;
-    //   this.permissions = response.prm;
-    //   this.log.info({
-    //     response,
-    //     sessionKey: this.sessionKey,
-    //     merchantKey: this.merchantKey,
-    //     permissions: this.permissions,
-    //   });
-    //   return response;
-    // }
     /**
      * Returns rates.
      */

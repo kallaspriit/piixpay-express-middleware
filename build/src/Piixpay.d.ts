@@ -5,13 +5,8 @@ import { ILogger } from "ts-log";
  */
 export interface IPiixpayConfig {
     key: string;
-    username: string;
-    password: string;
     baseUrl?: string;
 }
-/**
- * Parameters for creating an invoice.
- */
 /**
  * Supported request methods.
  */
@@ -56,6 +51,9 @@ export declare enum InvoiceStatus {
     CANCELLED = "X",
     ARCHIVED = "Z",
 }
+/**
+ * Common response envelope info.
+ */
 export interface ICommonResponse {
     ok: boolean;
     error?: string;

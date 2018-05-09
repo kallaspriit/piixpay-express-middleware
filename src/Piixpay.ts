@@ -7,18 +7,8 @@ import { dummyLogger, ILogger } from "ts-log";
  */
 export interface IPiixpayConfig {
   key: string;
-  username: string;
-  password: string;
   baseUrl?: string;
 }
-
-/**
- * Parameters for creating an invoice.
- */
-// export interface ICreateInvoiceInfo {
-//   dueAmount: number;
-//   message: string;
-// }
 
 /**
  * Supported request methods.
@@ -68,6 +58,9 @@ export enum InvoiceStatus {
   ARCHIVED = "Z",
 }
 
+/**
+ * Common response envelope info.
+ */
 export interface ICommonResponse {
   ok: boolean;
   error?: string;
@@ -177,8 +170,6 @@ export interface IInvoiceInfo {
   received_coin: number;
   missing_coin: number;
   coin_address: string;
-
-  // TODO: https://piixpay.com/apidoc/index.html#api-Invoice-PostInvoiceAdd
 }
 
 /**
@@ -202,13 +193,6 @@ export interface IGetInvoiceResponse extends ICommonResponse {
  */
 export default class Piixpay {
   private readonly config: Required<IPiixpayConfig>;
-  // private isLoggedIn = false;
-  // private sessionKey?: string;
-  // private merchantKey?: string;
-  // private permissions = {
-  //   pos: false,
-  //   settle: false,
-  // };
 
   /**
    * Constructor.
@@ -242,32 +226,6 @@ export default class Piixpay {
 
     return keys.find(statusKey => InvoiceStatus[statusKey] === statusValue);
   }
-
-  // public async login(): Promise<ILoginResponse> {
-  //   const response = await this.post<ILoginResponse>("/auth/login", {
-  //     username: this.config.username,
-  //     password: this.config.password,
-  //     permanent: false,
-  //   });
-
-  //   if (!response.ok) {
-  //     throw new Error(`Login failed (${response.error} - ${response.desc})`);
-  //   }
-
-  //   this.isLoggedIn = true;
-  //   this.sessionKey = response.session_key;
-  //   this.merchantKey = response.merchant_key;
-  //   this.permissions = response.prm;
-
-  //   this.log.info({
-  //     response,
-  //     sessionKey: this.sessionKey,
-  //     merchantKey: this.merchantKey,
-  //     permissions: this.permissions,
-  //   });
-
-  //   return response;
-  // }
 
   /**
    * Returns rates.
