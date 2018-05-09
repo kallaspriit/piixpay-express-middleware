@@ -83,6 +83,25 @@ app.get("/", async (_request, response, _next) => {
       </p>
     </form>
 
+    <h2>Payments</h2>
+    ${invoiceDatabase.length === 0 ? "No payments have been requested" : ""}
+    <ul>
+      ${invoiceDatabase.map(
+        invoice => `
+        <li>
+          <a href="/invoice/${invoice.transactionKey}">${invoice.description}</a>
+          <ul>
+            <li><strong>Transaction key:</strong> ${invoice.transactionKey}</li>
+            <li><strong>Amount paid:</strong> ${invoice.received.eur}€/${invoice.due.eur} ${invoice.coin} (${
+          invoice.amountStatus
+        })</li>
+            <li><strong>Payment status:</strong> ${invoice.paymentStatus}</li>
+          </ul>
+        </li>
+      `,
+      )}
+    </ul>
+
     <h2>Rates</h2>
     <pre>${JSON.stringify(rates, undefined, "  ")}</pre>
   `);
@@ -135,6 +154,8 @@ app.post("/pay", async (request, response, next) => {
 app.get("/invoice/:transactionKey", async (request, response, next) => {
   try {
     const invoice = await api.getInvoice(request.params.transactionKey);
+
+    await saveInvoice(invoice);
 
     response.send(`
       <h1>Invoice</h1>

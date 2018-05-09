@@ -91,7 +91,7 @@ app.get("/", function (_request, response, _next) { return __awaiter(_this, void
                 // show request payment form and list of existing payments
                 response.send("\n    <h1>Piixpay gateway</h1>\n\n    <h2>Request payment</h2>\n    <form method=\"post\" action=\"/pay\">\n      <p>\n        <input type=\"text\" name=\"sum_eur\" value=\"5\" /> Amount (EUR)\n      </p>\n      <p>\n        <input type=\"text\" name=\"description\" value=\"Test payment\" /> Description\n      </p>\n      <p>\n        <select name=\"coin\">\n          " + Object.keys(src_1.Coin)
                     .map(function (coinKey) { return "<option value=\"" + src_1.Coin[coinKey] + "\">" + coinKey + "</option>"; })
-                    .join("\n") + "\n        </select>\n        Coin\n      </p>\n      <p>\n        <input type=\"submit\" name=\"submit\" value=\"Request payment\" />\n      </p>\n    </form>\n\n    <h2>Rates</h2>\n    <pre>" + JSON.stringify(rates, undefined, "  ") + "</pre>\n  ");
+                    .join("\n") + "\n        </select>\n        Coin\n      </p>\n      <p>\n        <input type=\"submit\" name=\"submit\" value=\"Request payment\" />\n      </p>\n    </form>\n\n    <h2>Payments</h2>\n    " + (invoiceDatabase.length === 0 ? "No payments have been requested" : "") + "\n    <ul>\n      " + invoiceDatabase.map(function (invoice) { return "\n        <li>\n          <a href=\"/invoice/" + invoice.transactionKey + "\">" + invoice.description + "</a>\n          <ul>\n            <li><strong>Transaction key:</strong> " + invoice.transactionKey + "</li>\n            <li><strong>Amount paid:</strong> " + invoice.received.eur + "\u20AC/" + invoice.due.eur + " " + invoice.coin + " (" + invoice.amountStatus + ")</li>\n            <li><strong>Payment status:</strong> " + invoice.paymentStatus + "</li>\n          </ul>\n        </li>\n      "; }) + "\n    </ul>\n\n    <h2>Rates</h2>\n    <pre>" + JSON.stringify(rates, undefined, "  ") + "</pre>\n  ");
                 return [2 /*return*/];
         }
     });
@@ -132,17 +132,20 @@ app.get("/invoice/:transactionKey", function (request, response, next) { return 
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
+                _a.trys.push([0, 3, , 4]);
                 return [4 /*yield*/, api.getInvoice(request.params.transactionKey)];
             case 1:
                 invoice = _a.sent();
-                response.send("\n      <h1>Invoice</h1>\n\n      <ul>\n        <li><strong>Transaction key:</strong> " + invoice.transactionKey + "</li>\n        <li><strong>Is complete:</strong> " + invoice.isComplete + "</li>\n        <li><strong>Receiver:</strong> " + invoice.receiver.name + " - " + invoice.receiver.iban + "</li>\n        <li><strong>Payment status:</strong> " + invoice.paymentStatus + "</li>\n        <li><strong>Amount status:</strong> " + invoice.amountStatus + "</li>\n        <li><strong>Amount:</strong> " + invoice.amount.eur + "\u20AC (" + invoice.amount.coin.toFixed(COIN_DECIMAL_PLACES) + " " + invoice.coin + ")</li>\n        <li><strong>Due:</strong> " + invoice.due.eur + "\u20AC (" + invoice.due.coin + " " + invoice.coin + ")</li>\n        <li><strong>Received:</strong> " + invoice.received + " " + invoice.coin + " / " + invoice.due.coin + " " + invoice.coin + "</li>\n        <li><strong>Service fees:</strong> " + invoice.fees.service.eur + "\u20AC (" + invoice.fees.service.coin + " " + invoice.coin + ")</li>\n        <li><strong>Bank fees:</strong> " + invoice.fees.bank.eur + "\u20AC (" + invoice.fees.bank.coin + " " + invoice.coin + ")</li>\n        <li><strong>Total fees:</strong> " + invoice.fees.total.eur + "\u20AC (" + invoice.fees.total.coin + " " + invoice.coin + ")</li>\n        <li><strong>Rate:</strong> 1 " + invoice.coin + " = " + invoice.rate + "\u20AC</li>\n      </ul>\n\n      <h2>Raw</h2>\n      <pre>" + JSON.stringify(invoice, undefined, "  ") + "</pre>\n    ");
-                return [3 /*break*/, 3];
+                return [4 /*yield*/, saveInvoice(invoice)];
             case 2:
+                _a.sent();
+                response.send("\n      <h1>Invoice</h1>\n\n      <ul>\n        <li><strong>Transaction key:</strong> " + invoice.transactionKey + "</li>\n        <li><strong>Is complete:</strong> " + invoice.isComplete + "</li>\n        <li><strong>Receiver:</strong> " + invoice.receiver.name + " - " + invoice.receiver.iban + "</li>\n        <li><strong>Payment status:</strong> " + invoice.paymentStatus + "</li>\n        <li><strong>Amount status:</strong> " + invoice.amountStatus + "</li>\n        <li><strong>Amount:</strong> " + invoice.amount.eur + "\u20AC (" + invoice.amount.coin.toFixed(COIN_DECIMAL_PLACES) + " " + invoice.coin + ")</li>\n        <li><strong>Due:</strong> " + invoice.due.eur + "\u20AC (" + invoice.due.coin + " " + invoice.coin + ")</li>\n        <li><strong>Received:</strong> " + invoice.received + " " + invoice.coin + " / " + invoice.due.coin + " " + invoice.coin + "</li>\n        <li><strong>Service fees:</strong> " + invoice.fees.service.eur + "\u20AC (" + invoice.fees.service.coin + " " + invoice.coin + ")</li>\n        <li><strong>Bank fees:</strong> " + invoice.fees.bank.eur + "\u20AC (" + invoice.fees.bank.coin + " " + invoice.coin + ")</li>\n        <li><strong>Total fees:</strong> " + invoice.fees.total.eur + "\u20AC (" + invoice.fees.total.coin + " " + invoice.coin + ")</li>\n        <li><strong>Rate:</strong> 1 " + invoice.coin + " = " + invoice.rate + "\u20AC</li>\n      </ul>\n\n      <h2>Raw</h2>\n      <pre>" + JSON.stringify(invoice, undefined, "  ") + "</pre>\n    ");
+                return [3 /*break*/, 4];
+            case 3:
                 error_2 = _a.sent();
                 next(error_2);
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); });

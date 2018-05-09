@@ -78,23 +78,13 @@ export default class Invoice {
      */
     readonly coin: Coin;
     /**
+     * Description getter.
+     */
+    readonly description: string;
+    /**
      * Invoice amount getter.
      */
     readonly amount: {
-        eur: number;
-        coin: number;
-    };
-    /**
-     * Due amounts getter.
-     */
-    readonly due: {
-        eur: number;
-        coin: number;
-    };
-    /**
-     * Received amounts getter.
-     */
-    readonly received: {
         eur: number;
         coin: number;
     };
@@ -116,6 +106,20 @@ export default class Invoice {
         };
     };
     /**
+     * Due amounts getter.
+     */
+    readonly due: {
+        eur: number;
+        coin: number;
+    };
+    /**
+     * Received amounts getter.
+     */
+    readonly received: {
+        eur: number;
+        coin: number;
+    };
+    /**
      * Rate getter.
      */
     readonly rate: number;
@@ -129,15 +133,8 @@ export default class Invoice {
         paymentStatus: InvoicePaymentStatus;
         amountStatus: InvoiceAmountStatus;
         coin: Coin;
+        description: string;
         amount: {
-            eur: number;
-            coin: number;
-        };
-        due: {
-            eur: number;
-            coin: number;
-        };
-        received: {
             eur: number;
             coin: number;
         };
@@ -154,6 +151,14 @@ export default class Invoice {
                 eur: number;
                 coin: number;
             };
+        };
+        due: {
+            eur: number;
+            coin: number;
+        };
+        received: {
+            eur: number;
+            coin: number;
         };
         rate: number;
         info: IInvoiceInfo;

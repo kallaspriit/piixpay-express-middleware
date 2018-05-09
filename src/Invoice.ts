@@ -131,6 +131,13 @@ export default class Invoice {
   }
 
   /**
+   * Description getter.
+   */
+  public get description() {
+    return this.info.description;
+  }
+
+  /**
    * Invoice amount getter.
    */
   public get amount() {
@@ -198,6 +205,7 @@ export default class Invoice {
       paymentStatus: this.paymentStatus,
       amountStatus: this.amountStatus,
       coin: this.coin,
+      description: this.description,
       amount: this.amount,
       fees: this.fees,
       due: this.due,

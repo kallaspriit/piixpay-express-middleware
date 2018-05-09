@@ -139,6 +139,16 @@ var Invoice = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Invoice.prototype, "description", {
+        /**
+         * Description getter.
+         */
+        get: function () {
+            return this.info.description;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Invoice.prototype, "amount", {
         /**
          * Invoice amount getter.
@@ -147,6 +157,29 @@ var Invoice = /** @class */ (function () {
             return {
                 eur: this.info.sum_eur,
                 coin: this.info.sum_eur / this.rate,
+            };
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Invoice.prototype, "fees", {
+        /**
+         * Fee amounts getter.
+         */
+        get: function () {
+            return {
+                service: {
+                    eur: this.info.fees_eur,
+                    coin: this.info.fees_coin,
+                },
+                bank: {
+                    eur: this.info.bank_fees_eur,
+                    coin: this.info.bank_fees_coin,
+                },
+                total: {
+                    eur: this.info.fees_eur + this.info.bank_fees_eur,
+                    coin: this.info.fees_coin + this.info.bank_fees_coin,
+                },
             };
         },
         enumerable: true,
@@ -178,29 +211,6 @@ var Invoice = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Invoice.prototype, "fees", {
-        /**
-         * Fee amounts getter.
-         */
-        get: function () {
-            return {
-                service: {
-                    eur: this.info.fees_eur,
-                    coin: this.info.fees_coin,
-                },
-                bank: {
-                    eur: this.info.bank_fees_eur,
-                    coin: this.info.bank_fees_coin,
-                },
-                total: {
-                    eur: this.info.fees_eur + this.info.bank_fees_eur,
-                    coin: this.info.fees_coin + this.info.bank_fees_coin,
-                },
-            };
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(Invoice.prototype, "rate", {
         /**
          * Rate getter.
@@ -222,10 +232,11 @@ var Invoice = /** @class */ (function () {
             paymentStatus: this.paymentStatus,
             amountStatus: this.amountStatus,
             coin: this.coin,
+            description: this.description,
             amount: this.amount,
+            fees: this.fees,
             due: this.due,
             received: this.received,
-            fees: this.fees,
             rate: this.rate,
             info: this.info,
         };
