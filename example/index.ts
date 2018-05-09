@@ -6,7 +6,7 @@ import * as http from "http";
 // import * as HttpStatus from "http-status-codes";
 import * as https from "https";
 // import * as querystring from "querystring";
-import blockchainMiddleware, { Coin, IInvoice, Invoice, Piixpay } from "../src";
+import blockchainMiddleware, { Coin, Invoice, Piixpay } from "../src";
 
 // load the .env configuration (https://github.com/motdotla/dotenv)
 dotenv.config();
@@ -14,6 +14,7 @@ dotenv.config();
 // constants
 const HTTP_PORT = 80;
 const DEFAULT_PORT = 3000;
+const COIN_DECIMAL_PLACES = 4;
 
 // extract configuration from the .env environment variables
 const config = {
@@ -32,7 +33,7 @@ const config = {
 };
 
 // invoices "database" emulated with a simple array (store the data only)
-const invoiceDatabase: IInvoice[] = [];
+const invoiceDatabase: Invoice[] = [];
 
 // initiate api
 const api = new Piixpay(config.api, console);
@@ -48,8 +49,6 @@ app.use(bodyParser.json());
 app.use(
   "/payment",
   blockchainMiddleware({
-    secret: "xxx",
-    requiredConfirmations: 3,
     saveInvoice,
     loadInvoice,
   }),
@@ -126,7 +125,7 @@ app.post("/pay", async (request, response, next) => {
     // await saveInvoice(invoice);
 
     // redirect user to invoice view (use address as unique id)
-    response.redirect(`/invoice/${invoice.transaction_key}`);
+    response.redirect(`/invoice/${invoice.transactionKey}`);
   } catch (error) {
     next(error);
   }
@@ -141,16 +140,21 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
       <h1>Invoice</h1>
 
       <ul>
-        <li><strong>Transaction key:</strong> ${invoice.transaction_key}</li>
-        <li><strong>Receiver:</strong> ${invoice.receiver_name} - ${invoice.receiver_iban}</li>
-        <li><strong>Status:</strong> ${Piixpay.getStatusByValue(invoice.status)} (${invoice.status})</li>
-        <li><strong>Due:</strong> ${invoice.sum_eur}€ (${invoice.total_coin} ${invoice.coin})</li>
-        <li><strong>Received:</strong> ${invoice.received_coin} ${invoice.coin} / ${invoice.total_coin} ${
+        <li><strong>Transaction key:</strong> ${invoice.transactionKey}</li>
+        <li><strong>Is complete:</strong> ${invoice.isComplete}</li>
+        <li><strong>Receiver:</strong> ${invoice.receiver.name} - ${invoice.receiver.iban}</li>
+        <li><strong>Payment status:</strong> ${invoice.paymentStatus}</li>
+        <li><strong>Amount status:</strong> ${invoice.amountStatus}</li>
+        <li><strong>Amount:</strong> ${invoice.amount.eur}€ (${invoice.amount.coin.toFixed(COIN_DECIMAL_PLACES)} ${
       invoice.coin
-    }</li>
-        <li><strong>Service fees:</strong> ${invoice.fees_eur}€ (${invoice.fees_coin} ${invoice.coin})</li>
-        <li><strong>Bank fees:</strong> ${invoice.bank_fees_eur}€ (${invoice.bank_fees_coin} ${invoice.coin})</li>
-        <li><strong>Total:</strong> ${invoice.total_eur}€ (${invoice.total_coin} ${invoice.coin})</li>
+    })</li>
+        <li><strong>Due:</strong> ${invoice.due.eur}€ (${invoice.due.coin} ${invoice.coin})</li>
+        <li><strong>Received:</strong> ${invoice.received} ${invoice.coin} / ${invoice.due.coin} ${invoice.coin}</li>
+        <li><strong>Service fees:</strong> ${invoice.fees.service.eur}€ (${invoice.fees.service.coin} ${
+      invoice.coin
+    })</li>
+        <li><strong>Bank fees:</strong> ${invoice.fees.bank.eur}€ (${invoice.fees.bank.coin} ${invoice.coin})</li>
+        <li><strong>Total fees:</strong> ${invoice.fees.total.eur}€ (${invoice.fees.total.coin} ${invoice.coin})</li>
         <li><strong>Rate:</strong> 1 ${invoice.coin} = ${invoice.rate}€</li>
       </ul>
 
@@ -281,38 +285,22 @@ if (config.server.useSSL) {
 }
 
 async function saveInvoice(invoice: Invoice): Promise<void> {
-  // find invoice by address
-  const index = invoiceDatabase.findIndex(item => item.address === invoice.address);
+  const existingInvoiceIndex = invoiceDatabase.findIndex(item => item.transactionKey === invoice.transactionKey);
 
-  // update existing invoice if exists, otherwise add a new one
-  if (index !== -1) {
-    invoiceDatabase[index] = invoice.toJSON();
+  if (existingInvoiceIndex !== -1) {
+    invoiceDatabase[existingInvoiceIndex] = invoice;
   } else {
-    invoiceDatabase.push(invoice.toJSON());
-  }
-
-  // save invoice for complete state is guaranteed to be called only once, ship out the products etc
-  if (invoice.isComplete()) {
-    console.log(invoice, "invoice is now complete");
+    invoiceDatabase.push(invoice);
   }
 }
 
-async function loadInvoice(address: string): Promise<Invoice | undefined> {
-  // search for invoice by address
-  const invoiceInfo = invoiceDatabase.find(item => item.address === address);
+// TODO: needed?
+async function loadInvoice(transactionKey: string): Promise<Invoice | undefined> {
+  const invoice = invoiceDatabase.find(item => item.transactionKey === transactionKey);
 
-  // return undefined if not found
-  if (!invoiceInfo) {
+  if (!invoice) {
     return undefined;
   }
 
-  // de-serialize the invoice
-  return new Invoice(invoiceInfo);
+  return invoice;
 }
-
-// function getAbsoluteUrl(path: string) {
-//   const port = config.server.port === HTTP_PORT ? "" : `:${config.server.port}`;
-//   const url = `${config.server.host}${port}${path}`.replace(/\/{2,}/g, "/");
-
-//   return `${config.server.useSSL ? "https" : "http"}://${url}`;
-// }

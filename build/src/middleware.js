@@ -37,12 +37,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
-var HttpStatus = require("http-status-codes");
 var ts_log_1 = require("ts-log");
 var index_1 = require("./index");
-// private constants
-var OK_RESPONSE = "*ok*";
-var PENDING_RESPONSE = "pending"; // actual value is not important
 exports.default = (function (options) {
     var log = options.log !== undefined ? options.log : ts_log_1.dummyLogger;
     var router = express.Router();
@@ -59,109 +55,12 @@ exports.default = (function (options) {
     }); });
     // handle payment update request
     router.get("/handle-payment", function (request, response, _next) { return __awaiter(_this, void 0, void 0, function () {
-        var _a, signature, address, transactionHash, value, confirmations, invoiceInfo, invoice, expectedSignature, isSignatureValid, isAddressValid, isHashValid, isUpdateValid, previousState, newState, hasSufficientConfirmations, isComplete, responseText;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    _a = request.query, signature = _a.signature, address = _a.address, transactionHash = _a.transaction_hash, value = _a.value, confirmations = _a.confirmations;
-                    return [4 /*yield*/, options.loadInvoice(address)];
-                case 1:
-                    invoiceInfo = _b.sent();
-                    // give up if an invoice with given address could not be found
-                    if (!invoiceInfo) {
-                        log.info({
-                            query: request.query,
-                        }, "invoice could not be found");
-                        // still send the OK response as we don't want any more updates on this invoice
-                        response.send(OK_RESPONSE);
-                        return [2 /*return*/];
-                    }
-                    invoice = new index_1.Invoice(invoiceInfo);
-                    expectedSignature = invoice.getSignature(options.secret);
-                    isSignatureValid = signature === expectedSignature;
-                    isAddressValid = invoice.address === address;
-                    isHashValid = true;
-                    isUpdateValid = isSignatureValid && isAddressValid && isHashValid;
-                    // respond with bad request if update was not valid
-                    if (!isUpdateValid) {
-                        // log failing update info
-                        log.warn({
-                            query: request.query,
-                            info: { signature: signature, address: address, transactionHash: transactionHash, value: value, confirmations: confirmations },
-                            invoice: invoice,
-                            isSignatureValid: isSignatureValid,
-                            isAddressValid: isAddressValid,
-                            isHashValid: isHashValid,
-                            isUpdateValid: isUpdateValid,
-                        }, "got invalid payment update");
-                        // respond with bad request
-                        response.status(HttpStatus.BAD_REQUEST).send("got invalid payment status update");
-                        return [2 /*return*/];
-                    }
-                    // don't update an invoice that is already complete, also stop status updates
-                    if (invoice.isComplete()) {
-                        response.send(OK_RESPONSE);
-                        return [2 /*return*/];
-                    }
-                    // adds new transaction or updates an existing one if already exists
-                    try {
-                        invoice.registerTransaction({
-                            hash: transactionHash,
-                            amount: parseInt(value, 10),
-                            confirmations: parseInt(confirmations, 10),
-                        });
-                    }
-                    catch (error) {
-                        log.warn({
-                            query: request.query,
-                            info: { signature: signature, address: address, transactionHash: transactionHash, value: value, confirmations: confirmations },
-                            invoice: invoice,
-                            isSignatureValid: isSignatureValid,
-                            isAddressValid: isAddressValid,
-                            isHashValid: isHashValid,
-                            isUpdateValid: isUpdateValid,
-                        }, "got invalid transaction");
-                        // respond with bad request
-                        response.status(HttpStatus.BAD_REQUEST).send("got bad transaction");
-                        return [2 /*return*/];
-                    }
-                    previousState = invoice.getPaymentState();
-                    newState = previousState;
-                    hasSufficientConfirmations = invoice.hasSufficientConfirmations(options.requiredConfirmations);
-                    // resolve new state
-                    newState = hasSufficientConfirmations
-                        ? index_1.InvoicePaymentState.CONFIRMED
-                        : index_1.InvoicePaymentState.WAITING_FOR_CONFIRMATION;
-                    // update invoice payment state
-                    invoice.setPaymentState(newState);
-                    // check whether invoice was just paid
-                    if (previousState !== index_1.InvoicePaymentState.CONFIRMED && newState === index_1.InvoicePaymentState.CONFIRMED) {
-                        // ship out the products etc..
-                        // TODO: call some handler
-                        log.info(invoice, "invoice is now confirmed");
-                    }
-                    isComplete = invoice.isComplete();
-                    responseText = isComplete ? OK_RESPONSE : PENDING_RESPONSE;
-                    // log the request info
-                    log.info({
-                        query: request.query,
-                        info: { signature: signature, address: address, transactionHash: transactionHash, value: value, confirmations: confirmations },
-                        invoice: invoice,
-                        isSignatureValid: isSignatureValid,
-                        isAddressValid: isAddressValid,
-                        isHashValid: isHashValid,
-                        isUpdateValid: isUpdateValid,
-                        isComplete: isComplete,
-                    }, "got valid payment update");
-                    // save the invoice
-                    return [4 /*yield*/, options.saveInvoice(invoice)];
-                case 2:
-                    // save the invoice
-                    _b.sent();
-                    // respond with ok if we have reached a final state (will not get new updates after this)
-                    response.send(responseText);
-                    return [2 /*return*/];
-            }
+        return __generator(this, function (_a) {
+            log.info({
+                body: request.body,
+            }, "handling payment status");
+            response.send("ok");
+            return [2 /*return*/];
         });
     }); });
     return router;

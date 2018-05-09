@@ -1,6 +1,7 @@
 import Axios, { AxiosRequestConfig } from "axios";
 import * as querystring from "querystring";
 import { dummyLogger, ILogger } from "ts-log";
+import { Invoice } from "./index";
 
 /**
  * API configuration.
@@ -43,19 +44,19 @@ export enum Language {
 /**
  * Enumeration of possible invoice statuses.
  */
-export enum InvoiceStatus {
-  NEW = "N",
-  UNCONFIRMED_INCOMING = "U",
-  INCOMPLETE = "I",
-  FULL_WITH_EXCEPTION = "E",
-  FULL = "F",
-  FULL_WITH_GREATER_AMOUNT = "G",
-  PREPARED_FOR_BANK = "P",
-  SENT_TO_BANK = "S",
-  CONFIRMED_BY_BANK = "C",
-  REPAYMENT_INITIATED = "R",
-  CANCELLED = "X",
-  ARCHIVED = "Z",
+export enum PiixpayInvoiceStatus {
+  N = "N", // means NEW
+  U = "U", // means UNCONFIRMED_INCOMING
+  I = "I", // means INCOMPLETE
+  E = "E", // means FULL_WITH_EXCEPTION
+  F = "F", // means FULL
+  G = "G", // means FULL_WITH_GREATER_AMOUNT
+  P = "P", // means PREPARED_FOR_BANK
+  S = "S", // means SENT_TO_BANK
+  C = "C", // means CONFIRMED_BY_BANK
+  R = "R", // means REPAYMENT_INITIATED
+  X = "X", // means CANCELLED
+  Z = "Z", // means ARCHIVED
 }
 
 /**
@@ -134,13 +135,13 @@ export interface ICreateInvoiceRequest {
  */
 export interface IInvoiceInfo {
   transaction_key: string;
-  status: InvoiceStatus;
+  status: PiixpayInvoiceStatus;
   status_time: string;
   status_utime: number;
   created_time: string;
   created_utime: number;
   receiver_name: string;
-  receiver_address: string;
+  receiver_address: string | null;
   receiver_iban: string;
   coin: Coin;
   sum_eur: number;
@@ -221,10 +222,10 @@ export default class Piixpay {
    *
    * @param statusValue Status enumeration value
    */
-  public static getStatusByValue(statusValue: InvoiceStatus): keyof typeof InvoiceStatus | undefined {
-    const keys = Object.keys(InvoiceStatus) as Array<keyof typeof InvoiceStatus>;
+  public static getStatusByValue(statusValue: PiixpayInvoiceStatus): keyof typeof PiixpayInvoiceStatus | undefined {
+    const keys = Object.keys(PiixpayInvoiceStatus) as Array<keyof typeof PiixpayInvoiceStatus>;
 
-    return keys.find(statusKey => InvoiceStatus[statusKey] === statusValue);
+    return keys.find(statusKey => PiixpayInvoiceStatus[statusKey] === statusValue);
   }
 
   /**
@@ -239,7 +240,7 @@ export default class Piixpay {
    *
    * @param info Invoice info
    */
-  public async createInvoice(info: ICreateInvoiceRequest): Promise<IInvoiceInfo> {
+  public async createInvoice(info: ICreateInvoiceRequest): Promise<Invoice> {
     const response = await this.get<ICreateInvoiceResponse>(`/merc/${this.config.key}/invoice/add`, {
       // session_key: this.sessionKey,
       ...info,
@@ -249,7 +250,7 @@ export default class Piixpay {
       throw new Error(`Creating invoice failed (${response.error} - ${response.desc})`);
     }
 
-    return response.invoice;
+    return new Invoice(response.invoice);
   }
 
   /**
@@ -257,14 +258,14 @@ export default class Piixpay {
    *
    * @param transactionKey Transaction key
    */
-  public async getInvoice(transactionKey: string): Promise<IInvoiceInfo> {
+  public async getInvoice(transactionKey: string): Promise<Invoice> {
     const response = await this.get<IGetInvoiceResponse>(`/merc/${this.config.key}/invoice/${transactionKey}`);
 
     if (!response.ok) {
       throw new Error(`Getting invoice info failed (${response.error} - ${response.desc})`);
     }
 
-    return response.invoice;
+    return new Invoice(response.invoice);
   }
 
   /**

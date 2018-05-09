@@ -50,6 +50,7 @@ dotenv.config();
 // constants
 var HTTP_PORT = 80;
 var DEFAULT_PORT = 3000;
+var COIN_DECIMAL_PLACES = 4;
 // extract configuration from the .env environment variables
 var config = {
     server: {
@@ -76,8 +77,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // use the blockchain middleware
 app.use("/payment", src_1.default({
-    secret: "xxx",
-    requiredConfirmations: 3,
     saveInvoice: saveInvoice,
     loadInvoice: loadInvoice,
 }));
@@ -117,7 +116,7 @@ app.post("/pay", function (request, response, next) { return __awaiter(_this, vo
                 // save the invoice (this would normally hit an actual database)
                 // await saveInvoice(invoice);
                 // redirect user to invoice view (use address as unique id)
-                response.redirect("/invoice/" + invoice.transaction_key);
+                response.redirect("/invoice/" + invoice.transactionKey);
                 return [3 /*break*/, 4];
             case 3:
                 error_1 = _b.sent();
@@ -137,7 +136,7 @@ app.get("/invoice/:transactionKey", function (request, response, next) { return 
                 return [4 /*yield*/, api.getInvoice(request.params.transactionKey)];
             case 1:
                 invoice = _a.sent();
-                response.send("\n      <h1>Invoice</h1>\n\n      <ul>\n        <li><strong>Transaction key:</strong> " + invoice.transaction_key + "</li>\n        <li><strong>Receiver:</strong> " + invoice.receiver_name + " - " + invoice.receiver_iban + "</li>\n        <li><strong>Status:</strong> " + src_1.Piixpay.getStatusByValue(invoice.status) + " (" + invoice.status + ")</li>\n        <li><strong>Due:</strong> " + invoice.sum_eur + "\u20AC (" + invoice.total_coin + " " + invoice.coin + ")</li>\n        <li><strong>Received:</strong> " + invoice.received_coin + " " + invoice.coin + " / " + invoice.total_coin + " " + invoice.coin + "</li>\n        <li><strong>Service fees:</strong> " + invoice.fees_eur + "\u20AC (" + invoice.fees_coin + " " + invoice.coin + ")</li>\n        <li><strong>Bank fees:</strong> " + invoice.bank_fees_eur + "\u20AC (" + invoice.bank_fees_coin + " " + invoice.coin + ")</li>\n        <li><strong>Total:</strong> " + invoice.total_eur + "\u20AC (" + invoice.total_coin + " " + invoice.coin + ")</li>\n        <li><strong>Rate:</strong> 1 " + invoice.coin + " = " + invoice.rate + "\u20AC</li>\n      </ul>\n\n      <h2>Raw</h2>\n      <pre>" + JSON.stringify(invoice, undefined, "  ") + "</pre>\n    ");
+                response.send("\n      <h1>Invoice</h1>\n\n      <ul>\n        <li><strong>Transaction key:</strong> " + invoice.transactionKey + "</li>\n        <li><strong>Is complete:</strong> " + invoice.isComplete + "</li>\n        <li><strong>Receiver:</strong> " + invoice.receiver.name + " - " + invoice.receiver.iban + "</li>\n        <li><strong>Payment status:</strong> " + invoice.paymentStatus + "</li>\n        <li><strong>Amount status:</strong> " + invoice.amountStatus + "</li>\n        <li><strong>Amount:</strong> " + invoice.amount.eur + "\u20AC (" + invoice.amount.coin.toFixed(COIN_DECIMAL_PLACES) + " " + invoice.coin + ")</li>\n        <li><strong>Due:</strong> " + invoice.due.eur + "\u20AC (" + invoice.due.coin + " " + invoice.coin + ")</li>\n        <li><strong>Received:</strong> " + invoice.received + " " + invoice.coin + " / " + invoice.due.coin + " " + invoice.coin + "</li>\n        <li><strong>Service fees:</strong> " + invoice.fees.service.eur + "\u20AC (" + invoice.fees.service.coin + " " + invoice.coin + ")</li>\n        <li><strong>Bank fees:</strong> " + invoice.fees.bank.eur + "\u20AC (" + invoice.fees.bank.coin + " " + invoice.coin + ")</li>\n        <li><strong>Total fees:</strong> " + invoice.fees.total.eur + "\u20AC (" + invoice.fees.total.coin + " " + invoice.coin + ")</li>\n        <li><strong>Rate:</strong> 1 " + invoice.coin + " = " + invoice.rate + "\u20AC</li>\n      </ul>\n\n      <h2>Raw</h2>\n      <pre>" + JSON.stringify(invoice, undefined, "  ") + "</pre>\n    ");
                 return [3 /*break*/, 3];
             case 2:
                 error_2 = _a.sent();
@@ -248,41 +247,30 @@ if (config.server.useSSL) {
 }
 function saveInvoice(invoice) {
     return __awaiter(this, void 0, void 0, function () {
-        var index;
+        var existingInvoiceIndex;
         return __generator(this, function (_a) {
-            index = invoiceDatabase.findIndex(function (item) { return item.address === invoice.address; });
-            // update existing invoice if exists, otherwise add a new one
-            if (index !== -1) {
-                invoiceDatabase[index] = invoice.toJSON();
+            existingInvoiceIndex = invoiceDatabase.findIndex(function (item) { return item.transactionKey === invoice.transactionKey; });
+            if (existingInvoiceIndex !== -1) {
+                invoiceDatabase[existingInvoiceIndex] = invoice;
             }
             else {
-                invoiceDatabase.push(invoice.toJSON());
-            }
-            // save invoice for complete state is guaranteed to be called only once, ship out the products etc
-            if (invoice.isComplete()) {
-                console.log(invoice, "invoice is now complete");
+                invoiceDatabase.push(invoice);
             }
             return [2 /*return*/];
         });
     });
 }
-function loadInvoice(address) {
+// TODO: needed?
+function loadInvoice(transactionKey) {
     return __awaiter(this, void 0, void 0, function () {
-        var invoiceInfo;
+        var invoice;
         return __generator(this, function (_a) {
-            invoiceInfo = invoiceDatabase.find(function (item) { return item.address === address; });
-            // return undefined if not found
-            if (!invoiceInfo) {
+            invoice = invoiceDatabase.find(function (item) { return item.transactionKey === transactionKey; });
+            if (!invoice) {
                 return [2 /*return*/, undefined];
             }
-            // de-serialize the invoice
-            return [2 /*return*/, new src_1.Invoice(invoiceInfo)];
+            return [2 /*return*/, invoice];
         });
     });
 }
-// function getAbsoluteUrl(path: string) {
-//   const port = config.server.port === HTTP_PORT ? "" : `:${config.server.port}`;
-//   const url = `${config.server.host}${port}${path}`.replace(/\/{2,}/g, "/");
-//   return `${config.server.useSSL ? "https" : "http"}://${url}`;
-// }
 //# sourceMappingURL=index.js.map

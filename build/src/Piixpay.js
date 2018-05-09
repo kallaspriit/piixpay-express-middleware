@@ -46,6 +46,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = require("axios");
 var querystring = require("querystring");
 var ts_log_1 = require("ts-log");
+var index_1 = require("./index");
 /**
  * Supported request methods.
  */
@@ -79,21 +80,21 @@ var Language;
 /**
  * Enumeration of possible invoice statuses.
  */
-var InvoiceStatus;
-(function (InvoiceStatus) {
-    InvoiceStatus["NEW"] = "N";
-    InvoiceStatus["UNCONFIRMED_INCOMING"] = "U";
-    InvoiceStatus["INCOMPLETE"] = "I";
-    InvoiceStatus["FULL_WITH_EXCEPTION"] = "E";
-    InvoiceStatus["FULL"] = "F";
-    InvoiceStatus["FULL_WITH_GREATER_AMOUNT"] = "G";
-    InvoiceStatus["PREPARED_FOR_BANK"] = "P";
-    InvoiceStatus["SENT_TO_BANK"] = "S";
-    InvoiceStatus["CONFIRMED_BY_BANK"] = "C";
-    InvoiceStatus["REPAYMENT_INITIATED"] = "R";
-    InvoiceStatus["CANCELLED"] = "X";
-    InvoiceStatus["ARCHIVED"] = "Z";
-})(InvoiceStatus = exports.InvoiceStatus || (exports.InvoiceStatus = {}));
+var PiixpayInvoiceStatus;
+(function (PiixpayInvoiceStatus) {
+    PiixpayInvoiceStatus["N"] = "N";
+    PiixpayInvoiceStatus["U"] = "U";
+    PiixpayInvoiceStatus["I"] = "I";
+    PiixpayInvoiceStatus["E"] = "E";
+    PiixpayInvoiceStatus["F"] = "F";
+    PiixpayInvoiceStatus["G"] = "G";
+    PiixpayInvoiceStatus["P"] = "P";
+    PiixpayInvoiceStatus["S"] = "S";
+    PiixpayInvoiceStatus["C"] = "C";
+    PiixpayInvoiceStatus["R"] = "R";
+    PiixpayInvoiceStatus["X"] = "X";
+    PiixpayInvoiceStatus["Z"] = "Z";
+})(PiixpayInvoiceStatus = exports.PiixpayInvoiceStatus || (exports.PiixpayInvoiceStatus = {}));
 /**
  * Provides API for receiving payments through piixpay.com service.
  *
@@ -122,8 +123,8 @@ var Piixpay = /** @class */ (function () {
      * @param statusValue Status enumeration value
      */
     Piixpay.getStatusByValue = function (statusValue) {
-        var keys = Object.keys(InvoiceStatus);
-        return keys.find(function (statusKey) { return InvoiceStatus[statusKey] === statusValue; });
+        var keys = Object.keys(PiixpayInvoiceStatus);
+        return keys.find(function (statusKey) { return PiixpayInvoiceStatus[statusKey] === statusValue; });
     };
     /**
      * Returns rates.
@@ -151,7 +152,7 @@ var Piixpay = /** @class */ (function () {
                         if (!response.ok) {
                             throw new Error("Creating invoice failed (" + response.error + " - " + response.desc + ")");
                         }
-                        return [2 /*return*/, response.invoice];
+                        return [2 /*return*/, new index_1.Invoice(response.invoice)];
                 }
             });
         });
@@ -172,7 +173,7 @@ var Piixpay = /** @class */ (function () {
                         if (!response.ok) {
                             throw new Error("Getting invoice info failed (" + response.error + " - " + response.desc + ")");
                         }
-                        return [2 /*return*/, response.invoice];
+                        return [2 /*return*/, new index_1.Invoice(response.invoice)];
                 }
             });
         });

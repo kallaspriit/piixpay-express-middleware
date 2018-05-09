@@ -1,5 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 import { ILogger } from "ts-log";
+import { Invoice } from "./index";
 /**
  * API configuration.
  */
@@ -37,19 +38,19 @@ export declare enum Language {
 /**
  * Enumeration of possible invoice statuses.
  */
-export declare enum InvoiceStatus {
-    NEW = "N",
-    UNCONFIRMED_INCOMING = "U",
-    INCOMPLETE = "I",
-    FULL_WITH_EXCEPTION = "E",
-    FULL = "F",
-    FULL_WITH_GREATER_AMOUNT = "G",
-    PREPARED_FOR_BANK = "P",
-    SENT_TO_BANK = "S",
-    CONFIRMED_BY_BANK = "C",
-    REPAYMENT_INITIATED = "R",
-    CANCELLED = "X",
-    ARCHIVED = "Z",
+export declare enum PiixpayInvoiceStatus {
+    N = "N",
+    U = "U",
+    I = "I",
+    E = "E",
+    F = "F",
+    G = "G",
+    P = "P",
+    S = "S",
+    C = "C",
+    R = "R",
+    X = "X",
+    Z = "Z",
 }
 /**
  * Common response envelope info.
@@ -123,13 +124,13 @@ export interface ICreateInvoiceRequest {
  */
 export interface IInvoiceInfo {
     transaction_key: string;
-    status: InvoiceStatus;
+    status: PiixpayInvoiceStatus;
     status_time: string;
     status_utime: number;
     created_time: string;
     created_utime: number;
     receiver_name: string;
-    receiver_address: string;
+    receiver_address: string | null;
     receiver_iban: string;
     coin: Coin;
     sum_eur: number;
@@ -194,7 +195,7 @@ export default class Piixpay {
      *
      * @param statusValue Status enumeration value
      */
-    static getStatusByValue(statusValue: InvoiceStatus): keyof typeof InvoiceStatus | undefined;
+    static getStatusByValue(statusValue: PiixpayInvoiceStatus): keyof typeof PiixpayInvoiceStatus | undefined;
     /**
      * Returns rates.
      */
@@ -204,13 +205,13 @@ export default class Piixpay {
      *
      * @param info Invoice info
      */
-    createInvoice(info: ICreateInvoiceRequest): Promise<IInvoiceInfo>;
+    createInvoice(info: ICreateInvoiceRequest): Promise<Invoice>;
     /**
      * Returns invoice info by transaction key.
      *
      * @param transactionKey Transaction key
      */
-    getInvoice(transactionKey: string): Promise<IInvoiceInfo>;
+    getInvoice(transactionKey: string): Promise<Invoice>;
     /**
      * Makes an API request.
      *

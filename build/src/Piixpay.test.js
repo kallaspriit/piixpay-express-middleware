@@ -38,6 +38,8 @@ var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = require("axios");
 var axios_mock_adapter_1 = require("axios-mock-adapter");
+// import * as HttpStatus from "http-status-codes";
+// import { ILogger } from "ts-log";
 // const CALLBACK_URL = "https://example.com";
 // const RECEIVING_ADDRESS = "2FupTEd3PDF7HVxNrzNqQGGoWZA4rqiphq";
 // const API_KEY = "xxx";
@@ -127,17 +129,16 @@ describe("Blockchain", function () {
     //   expect((mockLogger.info as any).mock.calls).toMatchSnapshot();
     // });
 });
-function processInvoiceForSnapshot(invoice) {
-    invoice.createdDate = new Date("2018-04-19T13:48:05.316Z");
-    invoice.updatedDate = new Date("2018-04-20T13:48:05.316Z");
-    invoice.transactions.forEach(function (transaction) {
-        transaction.createdDate = new Date("2018-04-19T13:48:05.316Z");
-        transaction.updatedDate = new Date("2018-04-20T13:48:05.316Z");
-    });
-    invoice.stateTransitions.forEach(function (stateTransition) {
-        stateTransition.date = new Date("2018-04-21T13:48:05.316Z");
-    });
-    return invoice;
-}
-exports.processInvoiceForSnapshot = processInvoiceForSnapshot;
+// export function processInvoiceForSnapshot<T extends Invoice | IInvoice>(invoice: T): T {
+//   invoice.createdDate = new Date("2018-04-19T13:48:05.316Z");
+//   invoice.updatedDate = new Date("2018-04-20T13:48:05.316Z");
+//   invoice.transactions.forEach(transaction => {
+//     transaction.createdDate = new Date("2018-04-19T13:48:05.316Z");
+//     transaction.updatedDate = new Date("2018-04-20T13:48:05.316Z");
+//   });
+//   invoice.stateTransitions.forEach(stateTransition => {
+//     stateTransition.date = new Date("2018-04-21T13:48:05.316Z");
+//   });
+//   return invoice;
+// }
 //# sourceMappingURL=Piixpay.test.js.map

@@ -1,103 +1,44 @@
+import { Coin, IInvoiceInfo } from "./index";
 /**
- * Information needed to generate invoice signature.
+ * Enumeration of possible invoice statuses.
+ *
+ * The single-letter Piixpay API statuses are hard to follow so a mapping to this enumeration is provided.
  */
-export interface IInvoiceSignatureInfo {
-    dueAmount: number;
-    message: string;
-}
-/**
- * Transaction info.
- */
-export interface ITransaction {
-    hash: string;
-    amount: number;
-    confirmations: number;
-    createdDate: Date;
-    updatedDate: Date;
-}
-/**
- * State transition info.
- */
-export interface IStateTransition {
-    previousState: InvoicePaymentState;
-    newState: InvoicePaymentState;
-    date: Date;
-}
-/**
- * Invoice payment state enumeration.
- */
-export declare enum InvoicePaymentState {
-    PENDING = "PENDING",
-    WAITING_FOR_CONFIRMATION = "WAITING_FOR_CONFIRMATION",
-    CONFIRMED = "CONFIRMED",
+export declare enum InvoicePaymentStatus {
+    NEW = "NEW",
+    UNCONFIRMED_INCOMING = "UNCONFIRMED_INCOMING",
+    INCOMPLETE = "INCOMPLETE",
+    FULL_WITH_EXCEPTION = "FULL_WITH_EXCEPTION",
+    FULL = "FULL",
+    FULL_WITH_GREATER_AMOUNT = "FULL_WITH_GREATER_AMOUNT",
+    PREPARED_FOR_BANK = "PREPARED_FOR_BANK",
+    SENT_TO_BANK = "SENT_TO_BANK",
+    CONFIRMED_BY_BANK = "CONFIRMED_BY_BANK",
+    REPAYMENT_INITIATED = "REPAYMENT_INITIATED",
+    CANCELLED = "CANCELLED",
+    ARCHIVED = "ARCHIVED",
 }
 /**
  * Invoice amount state enumeration.
  */
-export declare enum InvoiceAmountState {
+export declare enum InvoiceAmountStatus {
     EXACT = "EXACT",
     OVERPAID = "OVERPAID",
     UNDERPAID = "UNDERPAID",
 }
 /**
- * Serialized invoice info.
+ * Receiver info.
  */
-export interface IInvoice {
-    dueAmount: number;
-    message: string;
-    address: string;
-    createdDate: Date;
-    updatedDate: Date;
-    transactions: ITransaction[];
-    stateTransitions: IStateTransition[];
-    paymentState: InvoicePaymentState;
+export interface IReceiverInfo {
+    name: string;
+    iban: string;
+    address: string | null;
 }
 /**
- * Information needed to construct an invoice.
- */
-export declare type InvoiceConstructorInfo = Pick<Invoice, "dueAmount" | "message" | "address">;
-/**
- * Omit keys from interface.
- */
-export declare type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-/**
  * Represents an invoice.
- *
- * Note that the invoice expects amounts in satoshis.
  */
 export default class Invoice {
-    /**
-     * Requested amount in satoshis due to be paid.
-     */
-    dueAmount: number;
-    /**
-     * Payment request message.
-     */
-    message: string;
-    /**
-     * Receiving address.
-     */
-    address: string;
-    /**
-     * Invoice created date.
-     */
-    createdDate: Date;
-    /**
-     * Invoice last updated date.
-     */
-    updatedDate: Date;
-    /**
-     * List of transactions associated with the invoice.
-     */
-    transactions: ITransaction[];
-    /**
-     * List of invoice state transitions.
-     */
-    stateTransitions: IStateTransition[];
-    /**
-     * Invoice payment state.
-     */
-    private paymentState;
+    private readonly info;
     /**
      * Constructs the invoice.
      *
@@ -105,97 +46,116 @@ export default class Invoice {
      *
      * @param info Invoice constructor info or serialized invoice info
      */
-    constructor(info: InvoiceConstructorInfo | IInvoice);
+    constructor(info: IInvoiceInfo);
     /**
-     * Returns invoice signature.
-     *
-     * The signature is used to verify that the update requests originate from the correct source.
-     *
-     * @param info Signature info
-     * @param secret Secret used to generate the signature
+     * Transaction key getter.
      */
-    static getInvoiceSignature(info: IInvoiceSignatureInfo, secret: string): string;
+    readonly transactionKey: string;
     /**
-     * Returns whether requested state transition is valid.
-     *
-     * @param currentState Current invoice state
-     * @param newState Requested invoice state
-     */
-    static isValidInvoiceStateTransition(currentState: InvoicePaymentState, newState: InvoicePaymentState): boolean;
-    /**
-     * Returns whether given invoice payment state is considered final.
-     *
-     * @param state Invoice payment state
-     */
-    static isCompleteState(state: InvoicePaymentState): boolean;
-    /**
-     * Registers payment transaction.
-     *
-     * Updates existing transaction if one exists, otherwise adds a new one.
-     *
-     * @param transaction Transaction info
-     */
-    registerTransaction(transaction: Omit<ITransaction, "createdDate" | "updatedDate">): void;
-    /**
-     * Returns invoice paid amount.
-     *
-     * This is summed over all associated transactions.
-     */
-    getPaidAmount(): number;
-    /**
-     * Returns payment amount state.
-     *
-     * The invoice might be under or overpaid.
-     */
-    getAmountState(): InvoiceAmountState;
-    /**
-     * Returns invoice payment state.
-     */
-    getPaymentState(): InvoicePaymentState;
-    /**
-     * Sets new payment state.
-     *
-     * An error is thrown if requested state transition is not considered valid.
-     *
-     * @param newState New payment state
-     */
-    setPaymentState(newState: InvoicePaymentState): void;
-    /**
-     * Returns invoice signature.
-     *
-     * @param secret Secret passphrase
-     */
-    getSignature(secret: string): string;
-    /**
-     * Returns whether state transition to provided state would be valid.
-     *
-     * @param newState New state to consider
-     */
-    isValidStateTransition(newState: InvoicePaymentState): boolean;
-    /**
-     * Returns whether the invoice is complete.
+     * Complete status getter.
      *
      * Complete invoices to not get any more updates.
      */
-    isComplete(): boolean;
+    readonly isComplete: boolean;
     /**
-     * Returns the number of confirmations.
-     *
-     * The returned confirmation count is the minimum of all registered transactions and zero if none have been added.
+     * Receiver info getter.
      */
-    getConfirmationCount(): number;
+    readonly receiver: IReceiverInfo;
     /**
-     * Returns whether the invoice has sufficient confirmations.
+     * Invoice payment status getter.
      *
-     * This means that the associated transactions with the lowest number of confirmations needs to match this.
-     *
-     * @param requiredConfirmationCount Required confirmation count
+     * The internal API single-letter status is mapped to InvoicePaymentStatus enumeration.
      */
-    hasSufficientConfirmations(requiredConfirmationCount?: number): boolean;
+    readonly paymentStatus: InvoicePaymentStatus;
     /**
-     * Returns serialized invoice info.
+     * Payment amount status getter.
      *
-     * The information returned by this method can be passed into the constructor to de-serialize the invoice.
+     * The invoice might be under or overpaid.
      */
-    toJSON(): IInvoice;
+    readonly amountStatus: InvoiceAmountStatus;
+    /**
+     * Coin symbol getter.
+     */
+    readonly coin: Coin;
+    /**
+     * Invoice amount getter.
+     */
+    readonly amount: {
+        eur: number;
+        coin: number;
+    };
+    /**
+     * Due amounts getter.
+     */
+    readonly due: {
+        eur: number;
+        coin: number;
+    };
+    /**
+     * Received amounts getter.
+     */
+    readonly received: {
+        eur: number;
+        coin: number;
+    };
+    /**
+     * Fee amounts getter.
+     */
+    readonly fees: {
+        service: {
+            eur: number;
+            coin: number;
+        };
+        bank: {
+            eur: number;
+            coin: number;
+        };
+        total: {
+            eur: number;
+            coin: number;
+        };
+    };
+    /**
+     * Rate getter.
+     */
+    readonly rate: number;
+    /**
+     * Serializes the invoice.
+     */
+    toJSON(): {
+        transactionKey: string;
+        isComplete: boolean;
+        receiver: IReceiverInfo;
+        paymentStatus: InvoicePaymentStatus;
+        amountStatus: InvoiceAmountStatus;
+        coin: Coin;
+        amount: {
+            eur: number;
+            coin: number;
+        };
+        due: {
+            eur: number;
+            coin: number;
+        };
+        received: {
+            eur: number;
+            coin: number;
+        };
+        fees: {
+            service: {
+                eur: number;
+                coin: number;
+            };
+            bank: {
+                eur: number;
+                coin: number;
+            };
+            total: {
+                eur: number;
+                coin: number;
+            };
+        };
+        rate: number;
+        info: IInvoiceInfo;
+    };
 }

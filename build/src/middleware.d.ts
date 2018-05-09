@@ -8,8 +8,6 @@ export interface IQrCodeParameters {
     message: string;
 }
 export interface IOptions {
-    secret: string;
-    requiredConfirmations: number;
     log?: ILogger;
     saveInvoice(invoice: Invoice): Promise<void>;
     loadInvoice(address: string): Promise<Invoice | undefined>;
