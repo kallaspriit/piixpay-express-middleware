@@ -51,6 +51,8 @@ export default class Invoice {
    */
   public constructor(private readonly info: IInvoiceInfo) {}
 
+  // public startMonitor(api: Piixpay) {}
+
   /**
    * Transaction key getter.
    */
@@ -195,6 +197,13 @@ export default class Invoice {
   }
 
   /**
+   * Payment url getter.
+   */
+  public get paymentUrl() {
+    return this.info.payment_url.replace("://", ":");
+  }
+
+  /**
    * Serializes the invoice.
    */
   public toJSON() {
@@ -211,6 +220,7 @@ export default class Invoice {
       due: this.due,
       received: this.received,
       rate: this.rate,
+      paymentUrl: this.paymentUrl,
       info: this.info,
     };
   }

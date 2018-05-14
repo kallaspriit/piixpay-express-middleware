@@ -5,7 +5,7 @@ import * as fs from "fs";
 import * as http from "http";
 // import * as HttpStatus from "http-status-codes";
 import * as https from "https";
-// import * as querystring from "querystring";
+import * as querystring from "querystring";
 import blockchainMiddleware, { Coin, Invoice, Piixpay } from "../src";
 
 // load the .env configuration (https://github.com/motdotla/dotenv)
@@ -47,7 +47,6 @@ app.use(bodyParser.json());
 
 // use the blockchain middleware
 app.use(
-  "/payment",
   blockchainMiddleware({
     saveInvoice,
     loadInvoice,
@@ -105,26 +104,6 @@ app.get("/", async (_request, response, _next) => {
     <h2>Rates</h2>
     <pre>${JSON.stringify(rates, undefined, "  ")}</pre>
   `);
-
-  /*
-  <h2>Payments</h2>
-    <ul>
-      ${invoiceDatabase.map(item => new Invoice(item)).map(
-        invoice => `
-        <li>
-          <a href="/invoice/${invoice.address}">${invoice.message}</a>
-          <ul>
-            <li><strong>Address:</strong> ${invoice.address}</li>
-            <li><strong>Amount paid:</strong> ${invoice.getPaidAmount()}/${
-          invoice.sum_eur
-        } BTC (${invoice.getAmountState()})</li>
-            <li><strong>State:</strong> ${invoice.getPaymentState()} (${invoice.getConfirmationCount()}/?</li>
-          </ul>
-        </li>
-      `,
-      )}
-    </ul>
-    */
 });
 
 // handle payment form request
@@ -157,6 +136,8 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
 
     await saveInvoice(invoice);
 
+    const qrCodeImageUrl = `/qr?${querystring.stringify({ payload: invoice.paymentUrl })}`;
+
     response.send(`
       <h1>Invoice</h1>
 
@@ -170,7 +151,9 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
       invoice.coin
     })</li>
         <li><strong>Due:</strong> ${invoice.due.eur}€ (${invoice.due.coin} ${invoice.coin})</li>
-        <li><strong>Received:</strong> ${invoice.received} ${invoice.coin} / ${invoice.due.coin} ${invoice.coin}</li>
+        <li><strong>Received:</strong> ${invoice.received.coin} ${invoice.coin} / ${invoice.due.coin} ${
+      invoice.coin
+    }</li>
         <li><strong>Service fees:</strong> ${invoice.fees.service.eur}€ (${invoice.fees.service.coin} ${
       invoice.coin
     })</li>
@@ -178,6 +161,8 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
         <li><strong>Total fees:</strong> ${invoice.fees.total.eur}€ (${invoice.fees.total.coin} ${invoice.coin})</li>
         <li><strong>Rate:</strong> 1 ${invoice.coin} = ${invoice.rate}€</li>
       </ul>
+
+      <img src="${qrCodeImageUrl}"/>
 
       <h2>Raw</h2>
       <pre>${JSON.stringify(invoice, undefined, "  ")}</pre>
@@ -188,91 +173,6 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
     next(error);
   }
 });
-
-// // handle invoice request
-// app.get("/invoice/:address", async (request, response, _next) => {
-//   // extract address from the url and attempt to load the invoice
-//   const { address } = request.params;
-//   const invoice = await loadInvoice(address);
-
-//   if (!invoice) {
-//     response.status(HttpStatus.NOT_FOUND).send(`Invoice with address "${address}" could not be found`);
-
-//     return;
-//   }
-
-//   // build qr code url
-//   const qrCodeParameters = {
-//     address: invoice.address,
-//     amount: satoshiToBitcoin(invoice.dueAmount),
-//     message: invoice.message,
-//   };
-//   const qrCodeUrl = getAbsoluteUrl(`/payment/qr?${querystring.stringify(qrCodeParameters)}`);
-
-//   // show payment request info along with the qr code to scan
-//   response.send(`
-//     <h1>Invoice</h1>
-
-//     <ul>
-//       <li><strong>Address:</strong> ${invoice.address}</li>
-//       <li><strong>Amount paid:</strong> ${satoshiToBitcoin(invoice.getPaidAmount())}/${satoshiToBitcoin(
-//     invoice.dueAmount,
-//   )} BTC (${invoice.getAmountState()})</li>
-//       <li><strong>Message:</strong> ${invoice.message}</li>
-//       <li><strong>Confirmations:</strong> ${invoice.getConfirmationCount()}/${config.app.requiredConfirmations}</li>
-//       <li><strong>State:</strong> ${invoice.getPaymentState()}</li>
-//       <li><strong>Is complete:</strong> ${invoice.isComplete() ? "yes" : "no"}</li>
-//       <li><strong>Created:</strong> ${invoice.createdDate.toISOString()}</li>
-//       <li><strong>Updated:</strong> ${invoice.updatedDate.toISOString()}</li>
-//       <li>
-//         <strong>Transactions:</strong>
-//         <ul>
-//           ${invoice.transactions.map(
-//             (transaction, index) => `
-//               <li>
-//                 <strong>Transaction #${index + 1}</strong>
-//                 <ul>
-//                   <li><strong>Hash:</strong> ${transaction.hash}</li>
-//                   <li><strong>Amount:</strong> ${satoshiToBitcoin(transaction.amount)} BTC</li>
-//                   <li><strong>Confirmations:</strong> ${transaction.confirmations}/${
-//               config.app.requiredConfirmations
-//             }</li>
-//                   <li><strong>Created:</strong> ${transaction.createdDate.toISOString()}</li>
-//                   <li><strong>Updated:</strong> ${transaction.updatedDate.toISOString()}</li>
-//                 </ul>
-//               </li>
-//           `,
-//           )}
-//         </ul>
-//       </li>
-//       <li>
-//         <strong>State transitions:</strong>
-//         <ul>
-//           ${invoice.stateTransitions.map(
-//             (stateTransition, index) => `
-//               <li>
-//                 <strong>State transition #${index + 1}</strong>
-//                 <ul>
-//                   <li><strong>Previous state:</strong> ${stateTransition.previousState}</li>
-//                   <li><strong>New state:</strong> ${stateTransition.newState}</li>
-//                   <li><strong>Date:</strong> ${stateTransition.date.toISOString()}</li>
-//                 </ul>
-//               </li>
-//           `,
-//           )}
-//         </ul>
-//       </li>
-//     </ul>
-
-//     <p>
-//       <img src="${qrCodeUrl}"/>
-//     </p>
-
-//     <p>
-//       <a href="${getAbsoluteUrl(`/invoice/${address}`)}">Refresh this page</a> to check for updates.
-//     </p>
-//   `);
-// });
 
 // create either http or https server depending on SSL configuration
 const server = config.server.useSSL

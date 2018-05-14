@@ -139,7 +139,7 @@ app.get("/invoice/:transactionKey", function (request, response, next) { return 
                 return [4 /*yield*/, saveInvoice(invoice)];
             case 2:
                 _a.sent();
-                response.send("\n      <h1>Invoice</h1>\n\n      <ul>\n        <li><strong>Transaction key:</strong> " + invoice.transactionKey + "</li>\n        <li><strong>Is complete:</strong> " + invoice.isComplete + "</li>\n        <li><strong>Receiver:</strong> " + invoice.receiver.name + " - " + invoice.receiver.iban + "</li>\n        <li><strong>Payment status:</strong> " + invoice.paymentStatus + "</li>\n        <li><strong>Amount status:</strong> " + invoice.amountStatus + "</li>\n        <li><strong>Amount:</strong> " + invoice.amount.eur + "\u20AC (" + invoice.amount.coin.toFixed(COIN_DECIMAL_PLACES) + " " + invoice.coin + ")</li>\n        <li><strong>Due:</strong> " + invoice.due.eur + "\u20AC (" + invoice.due.coin + " " + invoice.coin + ")</li>\n        <li><strong>Received:</strong> " + invoice.received + " " + invoice.coin + " / " + invoice.due.coin + " " + invoice.coin + "</li>\n        <li><strong>Service fees:</strong> " + invoice.fees.service.eur + "\u20AC (" + invoice.fees.service.coin + " " + invoice.coin + ")</li>\n        <li><strong>Bank fees:</strong> " + invoice.fees.bank.eur + "\u20AC (" + invoice.fees.bank.coin + " " + invoice.coin + ")</li>\n        <li><strong>Total fees:</strong> " + invoice.fees.total.eur + "\u20AC (" + invoice.fees.total.coin + " " + invoice.coin + ")</li>\n        <li><strong>Rate:</strong> 1 " + invoice.coin + " = " + invoice.rate + "\u20AC</li>\n      </ul>\n\n      <h2>Raw</h2>\n      <pre>" + JSON.stringify(invoice, undefined, "  ") + "</pre>\n    ");
+                response.send("\n      <h1>Invoice</h1>\n\n      <ul>\n        <li><strong>Transaction key:</strong> " + invoice.transactionKey + "</li>\n        <li><strong>Is complete:</strong> " + invoice.isComplete + "</li>\n        <li><strong>Receiver:</strong> " + invoice.receiver.name + " - " + invoice.receiver.iban + "</li>\n        <li><strong>Payment status:</strong> " + invoice.paymentStatus + "</li>\n        <li><strong>Amount status:</strong> " + invoice.amountStatus + "</li>\n        <li><strong>Amount:</strong> " + invoice.amount.eur + "\u20AC (" + invoice.amount.coin.toFixed(COIN_DECIMAL_PLACES) + " " + invoice.coin + ")</li>\n        <li><strong>Due:</strong> " + invoice.due.eur + "\u20AC (" + invoice.due.coin + " " + invoice.coin + ")</li>\n        <li><strong>Received:</strong> " + invoice.received.coin + " " + invoice.coin + " / " + invoice.due.coin + " " + invoice.coin + "</li>\n        <li><strong>Service fees:</strong> " + invoice.fees.service.eur + "\u20AC (" + invoice.fees.service.coin + " " + invoice.coin + ")</li>\n        <li><strong>Bank fees:</strong> " + invoice.fees.bank.eur + "\u20AC (" + invoice.fees.bank.coin + " " + invoice.coin + ")</li>\n        <li><strong>Total fees:</strong> " + invoice.fees.total.eur + "\u20AC (" + invoice.fees.total.coin + " " + invoice.coin + ")</li>\n        <li><strong>Rate:</strong> 1 " + invoice.coin + " = " + invoice.rate + "\u20AC</li>\n      </ul>\n\n      <h2>Raw</h2>\n      <pre>" + JSON.stringify(invoice, undefined, "  ") + "</pre>\n    ");
                 return [3 /*break*/, 4];
             case 3:
                 error_2 = _a.sent();
@@ -149,83 +149,6 @@ app.get("/invoice/:transactionKey", function (request, response, next) { return 
         }
     });
 }); });
-// // handle invoice request
-// app.get("/invoice/:address", async (request, response, _next) => {
-//   // extract address from the url and attempt to load the invoice
-//   const { address } = request.params;
-//   const invoice = await loadInvoice(address);
-//   if (!invoice) {
-//     response.status(HttpStatus.NOT_FOUND).send(`Invoice with address "${address}" could not be found`);
-//     return;
-//   }
-//   // build qr code url
-//   const qrCodeParameters = {
-//     address: invoice.address,
-//     amount: satoshiToBitcoin(invoice.dueAmount),
-//     message: invoice.message,
-//   };
-//   const qrCodeUrl = getAbsoluteUrl(`/payment/qr?${querystring.stringify(qrCodeParameters)}`);
-//   // show payment request info along with the qr code to scan
-//   response.send(`
-//     <h1>Invoice</h1>
-//     <ul>
-//       <li><strong>Address:</strong> ${invoice.address}</li>
-//       <li><strong>Amount paid:</strong> ${satoshiToBitcoin(invoice.getPaidAmount())}/${satoshiToBitcoin(
-//     invoice.dueAmount,
-//   )} BTC (${invoice.getAmountState()})</li>
-//       <li><strong>Message:</strong> ${invoice.message}</li>
-//       <li><strong>Confirmations:</strong> ${invoice.getConfirmationCount()}/${config.app.requiredConfirmations}</li>
-//       <li><strong>State:</strong> ${invoice.getPaymentState()}</li>
-//       <li><strong>Is complete:</strong> ${invoice.isComplete() ? "yes" : "no"}</li>
-//       <li><strong>Created:</strong> ${invoice.createdDate.toISOString()}</li>
-//       <li><strong>Updated:</strong> ${invoice.updatedDate.toISOString()}</li>
-//       <li>
-//         <strong>Transactions:</strong>
-//         <ul>
-//           ${invoice.transactions.map(
-//             (transaction, index) => `
-//               <li>
-//                 <strong>Transaction #${index + 1}</strong>
-//                 <ul>
-//                   <li><strong>Hash:</strong> ${transaction.hash}</li>
-//                   <li><strong>Amount:</strong> ${satoshiToBitcoin(transaction.amount)} BTC</li>
-//                   <li><strong>Confirmations:</strong> ${transaction.confirmations}/${
-//               config.app.requiredConfirmations
-//             }</li>
-//                   <li><strong>Created:</strong> ${transaction.createdDate.toISOString()}</li>
-//                   <li><strong>Updated:</strong> ${transaction.updatedDate.toISOString()}</li>
-//                 </ul>
-//               </li>
-//           `,
-//           )}
-//         </ul>
-//       </li>
-//       <li>
-//         <strong>State transitions:</strong>
-//         <ul>
-//           ${invoice.stateTransitions.map(
-//             (stateTransition, index) => `
-//               <li>
-//                 <strong>State transition #${index + 1}</strong>
-//                 <ul>
-//                   <li><strong>Previous state:</strong> ${stateTransition.previousState}</li>
-//                   <li><strong>New state:</strong> ${stateTransition.newState}</li>
-//                   <li><strong>Date:</strong> ${stateTransition.date.toISOString()}</li>
-//                 </ul>
-//               </li>
-//           `,
-//           )}
-//         </ul>
-//       </li>
-//     </ul>
-//     <p>
-//       <img src="${qrCodeUrl}"/>
-//     </p>
-//     <p>
-//       <a href="${getAbsoluteUrl(`/invoice/${address}`)}">Refresh this page</a> to check for updates.
-//     </p>
-//   `);
-// });
 // create either http or https server depending on SSL configuration
 var server = config.server.useSSL
     ? https.createServer({

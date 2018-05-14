@@ -45,6 +45,7 @@ var Invoice = /** @class */ (function () {
         this.info = info;
     }
     Object.defineProperty(Invoice.prototype, "transactionKey", {
+        // public startMonitor(api: Piixpay) {}
         /**
          * Transaction key getter.
          */

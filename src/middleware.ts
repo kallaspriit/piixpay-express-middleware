@@ -1,11 +1,9 @@
 import * as express from "express";
 import { dummyLogger, ILogger } from "ts-log";
-import { getPaymentRequestQrCode, Invoice } from "./index";
+import { getQrCodeImage, Invoice } from "./index";
 
 export interface IQrCodeParameters {
-  address: string;
-  amount: number | string;
-  message: string;
+  payload: string;
 }
 
 export interface IOptions {
@@ -21,9 +19,9 @@ export default (options: IOptions): express.Router => {
   // handle qr image request
   router.get("/qr", async (request, response, _next) => {
     // TODO: validate request parameters (json schema?)
-    const { address, amount, message } = request.query as IQrCodeParameters;
+    const { payload } = request.query as IQrCodeParameters;
 
-    const paymentRequestQrCode = getPaymentRequestQrCode(address, amount, message);
+    const paymentRequestQrCode = getQrCodeImage(payload);
 
     response.setHeader("Content-Type", "image/png");
     paymentRequestQrCode.pipe(response);
