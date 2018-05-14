@@ -50,6 +50,7 @@ app.use(
   blockchainMiddleware({
     saveInvoice,
     loadInvoice,
+    log: console,
   }),
 );
 
