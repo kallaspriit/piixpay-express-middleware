@@ -140,28 +140,59 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
       <h1>Invoice</h1>
 
       <ul>
-        <li><strong>Transaction key:</strong> ${invoice.transactionKey}</li>
-        <li><strong>Is paid:</strong> ${invoice.isPaid ? "yes" : "no"}</li>
-        <li><strong>Is complete:</strong> ${invoice.isComplete ? "yes" : "no"}</li>
-        <li><strong>Receiver:</strong> ${invoice.receiver.name} - ${invoice.receiver.iban}</li>
-        <li><strong>Payment status:</strong> ${invoice.paymentStatus}</li>
-        <li><strong>Amount status:</strong> ${invoice.amountStatus}</li>
-        <li><strong>Amount:</strong> ${invoice.amount.eur}€ (${invoice.amount.coin.toFixed(COIN_DECIMAL_PLACES)} ${
-      invoice.coin
-    })</li>
-        <li><strong>Due:</strong> ${invoice.due.eur}€ (${invoice.due.coin} ${invoice.coin})</li>
-        <li><strong>Received:</strong> ${invoice.received.coin} ${invoice.coin} / ${invoice.due.coin} ${
-      invoice.coin
-    }</li>
-        <li><strong>Service fees:</strong> ${invoice.fees.service.eur}€ (${invoice.fees.service.coin} ${
-      invoice.coin
-    })</li>
-        <li><strong>Bank fees:</strong> ${invoice.fees.bank.eur}€ (${invoice.fees.bank.coin} ${invoice.coin})</li>
-        <li><strong>Total fees:</strong> ${invoice.fees.total.eur}€ (${invoice.fees.total.coin} ${invoice.coin})</li>
-        <li><strong>Rate:</strong> 1 ${invoice.coin} = ${invoice.rate}€</li>
+        <li>
+          <strong>Transaction key:</strong>
+          ${invoice.transactionKey}
+        </li>
+        <li>
+          <strong>Receiver:</strong>
+          ${invoice.receiver.name} - ${invoice.receiver.iban}
+        </li>
+        <li>
+          <strong>Is paid:</strong>
+           ${invoice.isPaid ? "yes" : "no"}
+        <li>
+          <strong>Is complete:</strong>
+          ${invoice.isComplete ? "yes" : "no"}
+        </li>
+        <li>
+          <strong>Payment status:</strong>
+          ${invoice.paymentStatus}
+        </li>
+        <li>
+          <strong>Amount status:</strong>
+          ${invoice.amountStatus}
+        </li>
+        <li>
+          <strong>Amount:</strong>
+          ${invoice.amount.eur}€ (${invoice.amount.coin.toFixed(COIN_DECIMAL_PLACES)} ${invoice.coin})</li>
+        <li>
+          <strong>Service fees:</strong>
+          ${invoice.fees.service.eur}€ (${invoice.fees.service.coin} ${invoice.coin})
+        </li>
+        <li>
+          <strong>Bank fees:</strong>
+          ${invoice.fees.bank.eur}€ (${invoice.fees.bank.coin} ${invoice.coin})
+        </li>
+        <li>
+          <strong>Total fees:</strong>
+          ${invoice.fees.total.eur}€ (${invoice.fees.total.coin} ${invoice.coin})
+        </li>
+        <li>
+          <strong>Due:</strong>
+          ${invoice.due.eur}€ (${invoice.due.coin} ${invoice.coin})
+        </li>
+        <li>
+          <strong>Received:</strong>
+          ${invoice.received.coin} ${invoice.coin} / ${invoice.due.coin} ${invoice.coin}
+        </li>
+        <li>
+          <strong>Rate:</strong>
+          1 ${invoice.coin} = ${invoice.rate}€
+        </li>
       </ul>
 
-      <img src="${qrCodeImageUrl}"/>
+      <img src="${qrCodeImageUrl}" alt="${invoice.paymentUrl}"/>
 
       <h2>Raw</h2>
       <pre>${JSON.stringify(invoice, undefined, "  ")}</pre>
