@@ -66,6 +66,22 @@ export default class Invoice {
   }
 
   /**
+   * Paid status getter.
+   */
+  public get isPaid() {
+    const paidStates: InvoicePaymentStatus[] = [
+      InvoicePaymentStatus.FULL,
+      InvoicePaymentStatus.FULL_WITH_GREATER_AMOUNT,
+      InvoicePaymentStatus.PREPARED_FOR_BANK,
+      InvoicePaymentStatus.SENT_TO_BANK,
+      InvoicePaymentStatus.CONFIRMED_BY_BANK,
+      InvoicePaymentStatus.ARCHIVED,
+    ];
+
+    return paidStates.indexOf(this.paymentStatus) !== -1;
+  }
+
+  /**
    * Complete status getter.
    *
    * Complete invoices to not get any more updates.

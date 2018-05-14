@@ -91,10 +91,11 @@ app.get("/", async (_request, response, _next) => {
           <a href="/invoice/${invoice.transactionKey}">${invoice.description}</a>
           <ul>
             <li><strong>Transaction key:</strong> ${invoice.transactionKey}</li>
-            <li><strong>Amount paid:</strong> ${invoice.received.eur}€/${invoice.due.eur} ${invoice.coin} (${
+            <li><strong>Amount paid:</strong> ${invoice.received.coin}/${invoice.due.coin} ${invoice.coin} (${
           invoice.amountStatus
         })</li>
             <li><strong>Payment status:</strong> ${invoice.paymentStatus}</li>
+            <li><strong>Is paid:</strong> ${invoice.isPaid ? "yes" : "no"}</li>
           </ul>
         </li>
       `,
@@ -140,7 +141,8 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
 
       <ul>
         <li><strong>Transaction key:</strong> ${invoice.transactionKey}</li>
-        <li><strong>Is complete:</strong> ${invoice.isComplete}</li>
+        <li><strong>Is paid:</strong> ${invoice.isPaid ? "yes" : "no"}</li>
+        <li><strong>Is complete:</strong> ${invoice.isComplete ? "yes" : "no"}</li>
         <li><strong>Receiver:</strong> ${invoice.receiver.name} - ${invoice.receiver.iban}</li>
         <li><strong>Payment status:</strong> ${invoice.paymentStatus}</li>
         <li><strong>Amount status:</strong> ${invoice.amountStatus}</li>

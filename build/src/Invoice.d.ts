@@ -56,6 +56,10 @@ export default class Invoice {
      */
     readonly transactionKey: string;
     /**
+     * Paid status getter.
+     */
+    readonly isPaid: boolean;
+    /**
      * Complete status getter.
      *
      * Complete invoices to not get any more updates.

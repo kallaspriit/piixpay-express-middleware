@@ -55,6 +55,24 @@ var Invoice = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Invoice.prototype, "isPaid", {
+        /**
+         * Paid status getter.
+         */
+        get: function () {
+            var paidStates = [
+                InvoicePaymentStatus.FULL,
+                InvoicePaymentStatus.FULL_WITH_GREATER_AMOUNT,
+                InvoicePaymentStatus.PREPARED_FOR_BANK,
+                InvoicePaymentStatus.SENT_TO_BANK,
+                InvoicePaymentStatus.CONFIRMED_BY_BANK,
+                InvoicePaymentStatus.ARCHIVED,
+            ];
+            return paidStates.indexOf(this.paymentStatus) !== -1;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Invoice.prototype, "isComplete", {
         /**
          * Complete status getter.
