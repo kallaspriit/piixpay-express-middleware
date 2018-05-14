@@ -40,7 +40,6 @@ var express = require("express");
 var HttpStatus = require("http-status-codes");
 var ts_log_1 = require("ts-log");
 var index_1 = require("./index");
-// export type InvoiceUpdateCallback = (error: Error | null, info?: IInvoiceInfo) => void;
 exports.default = (function (options) {
     var log = options.log !== undefined ? options.log : ts_log_1.dummyLogger;
     var api = options.api;

@@ -1,5 +1,4 @@
-import { isEqual } from "lodash";
-import { Coin, IInvoiceInfo, Piixpay, PiixpayInvoiceStatus } from "./index";
+import { Coin, IInvoiceInfo, PiixpayInvoiceStatus } from "./index";
 
 /**
  * Enumeration of possible invoice statuses.
@@ -48,12 +47,6 @@ export type InvoiceUpdateCallback = (error: Error | null, info?: Invoice) => voi
  * Represents an invoice.
  */
 export default class Invoice {
-  /**
-   * Latest polling timer.
-   */
-  // tslint:disable-next-line:no-null-keyword
-  private pollTimeout: NodeJS.Timer | null = null;
-
   /**
    * Constructs the invoice.
    *
@@ -227,62 +220,6 @@ export default class Invoice {
    */
   public get paymentUrl() {
     return this.info.payment_url;
-  }
-
-  /**
-   * Starts the automatic new info poller.
-   *
-   * TODO: remove once callback logic gets implemented instead
-   *
-   * @param api Api to use
-   * @param callback Callback to call with new invoice info
-   */
-  public startPolling(api: Piixpay, callback: InvoiceUpdateCallback) {
-    // const timeSinceCreated = Date.now() - this.createdDate.getTime();
-    // const pollIntervalMap = {
-    //   [30 * 60 * 1000]: 15 * 1000,
-    //   [3 * 60 * 60 * 1000]: 5 * 60 * 1000,
-    // };
-
-    // console.log("timeSinceCreated", timeSinceCreated);
-    const pollInterval = 10000; // TODO: based on age
-
-    this.pollTimeout = setTimeout(async () => {
-      try {
-        const invoice = await api.getInvoice(this.transactionKey);
-
-        // tslint:disable-next-line:no-null-keyword
-        callback(null, invoice);
-
-        // schedule another poll
-        this.startPolling(api, callback);
-      } catch (error) {
-        callback(error);
-      }
-    }, pollInterval);
-  }
-
-  /**
-   * Ends polling if running.
-   */
-  public endPolling() {
-    if (this.pollTimeout === null) {
-      return;
-    }
-
-    clearTimeout(this.pollTimeout);
-
-    // tslint:disable-next-line:no-null-keyword
-    this.pollTimeout = null;
-  }
-
-  /**
-   * Returns whether current invoice has the same contents as the provided invoice.
-   *
-   * @param anotherInvoice Another invoice to compare to
-   */
-  public isSameAs(anotherInvoice: Invoice) {
-    return isEqual(this.toJSON(), anotherInvoice.toJSON());
   }
 
   /**

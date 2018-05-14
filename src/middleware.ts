@@ -17,8 +17,6 @@ export interface IOptions {
   saveInvoice(invoice: Invoice): Promise<void>;
 }
 
-// export type InvoiceUpdateCallback = (error: Error | null, info?: IInvoiceInfo) => void;
-
 export default (options: IOptions): express.Router => {
   const log = options.log !== undefined ? options.log : dummyLogger;
   const api = options.api;

@@ -41,7 +41,6 @@ var dotenv = require("dotenv");
 var express = require("express");
 var fs = require("fs");
 var http = require("http");
-// import * as HttpStatus from "http-status-codes";
 var https = require("https");
 var querystring = require("querystring");
 var src_1 = require("../src");
@@ -97,13 +96,6 @@ app.get("/", function (_request, response, _next) { return __awaiter(_this, void
         }
     });
 }); });
-// function difference(object: Dictionary<{}>, base: Dictionary<{}>) {
-//   return transform(object, (result, value, key) => {
-//     if (!isEqual(value, base[key])) {
-//       result[key] = isObject(value) && isObject(base[key]) ? difference(value, base[key]) : value;
-//     }
-//   });
-// }
 // handle payment form request
 app.post("/pay", function (request, response, next) { return __awaiter(_this, void 0, void 0, function () {
     var _a, sum_eur, description, coin, invoice, error_1;
@@ -121,51 +113,9 @@ app.post("/pay", function (request, response, next) { return __awaiter(_this, vo
                     })];
             case 2:
                 invoice = _b.sent();
-                // let lastInvoice = invoice;
-                // // start polling for updates
-                // invoice.startPolling(api, (error, updatedInvoice) => {
-                //   if (!updatedInvoice || error !== null) {
-                //     console.error({ error }, "failed to get invoice info");
-                //     return;
-                //   }
-                //   const hasInvoiceChanged = !lastInvoice.isSameAs(updatedInvoice);
-                //   const invoiceDifference = difference(invoice.toJSON(), updatedInvoice.toJSON());
-                //   lastInvoice = updatedInvoice;
-                //   console.log(
-                //     {
-                //       error,
-                //       hasInvoiceChanged,
-                //       invoiceDifference,
-                //       lastInvoice,
-                //       updatedInvoice,
-                //     },
-                //     "got invoice poll result",
-                //   );
-                // });
                 // save the invoice (this would normally hit an actual database)
                 return [4 /*yield*/, saveInvoice(invoice)];
             case 3:
-                // let lastInvoice = invoice;
-                // // start polling for updates
-                // invoice.startPolling(api, (error, updatedInvoice) => {
-                //   if (!updatedInvoice || error !== null) {
-                //     console.error({ error }, "failed to get invoice info");
-                //     return;
-                //   }
-                //   const hasInvoiceChanged = !lastInvoice.isSameAs(updatedInvoice);
-                //   const invoiceDifference = difference(invoice.toJSON(), updatedInvoice.toJSON());
-                //   lastInvoice = updatedInvoice;
-                //   console.log(
-                //     {
-                //       error,
-                //       hasInvoiceChanged,
-                //       invoiceDifference,
-                //       lastInvoice,
-                //       updatedInvoice,
-                //     },
-                //     "got invoice poll result",
-                //   );
-                // });
                 // save the invoice (this would normally hit an actual database)
                 _b.sent();
                 // redirect user to invoice view (use address as unique id)
