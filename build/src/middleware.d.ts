@@ -3,9 +3,7 @@ import * as express from "express";
 import { ILogger } from "ts-log";
 import { Invoice } from "./index";
 export interface IQrCodeParameters {
-    address: string;
-    amount: number | string;
-    message: string;
+    payload: string;
 }
 export interface IOptions {
     log?: ILogger;

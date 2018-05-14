@@ -222,6 +222,16 @@ var Invoice = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Invoice.prototype, "paymentUrl", {
+        /**
+         * Payment url getter.
+         */
+        get: function () {
+            return this.info.payment_url.replace("://", ":");
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * Serializes the invoice.
      */
@@ -239,6 +249,7 @@ var Invoice = /** @class */ (function () {
             due: this.due,
             received: this.received,
             rate: this.rate,
+            paymentUrl: this.paymentUrl,
             info: this.info,
         };
     };

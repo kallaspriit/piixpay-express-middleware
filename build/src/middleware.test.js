@@ -41,7 +41,6 @@ var express = require("express");
 var querystring = require("querystring");
 var supertest = require("supertest");
 var _1 = require("./");
-var RECEIVING_ADDRESS = "2FupTEd3PDF7HVxNrzNqQGGoWZA4rqiphq";
 // invoices "database" emulated with a simple array
 var invoiceDatabase = [];
 var server;
@@ -67,16 +66,12 @@ describe("middleware", function () {
         }
     });
     it("should provide qr code rendering", function () { return __awaiter(_this, void 0, void 0, function () {
-        var qrCodeParameters, response;
+        var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    qrCodeParameters = {
-                        address: RECEIVING_ADDRESS,
-                        amount: 1,
-                        message: "Test",
-                    };
-                    return [4 /*yield*/, server.get("/payment/qr?" + querystring.stringify(qrCodeParameters))];
+                case 0: return [4 /*yield*/, server.get("/payment/qr?" + querystring.stringify({
+                        payload: "bitcoin:bmitnJQ1OqzZzOGv6abovJxdO1PuSnqn?amount=0.00450000",
+                    }))];
                 case 1:
                     response = _a.sent();
                     expect(response.type).toEqual("image/png");

@@ -44,10 +44,10 @@ exports.default = (function (options) {
     var router = express.Router();
     // handle qr image request
     router.get("/qr", function (request, response, _next) { return __awaiter(_this, void 0, void 0, function () {
-        var _a, address, amount, message, paymentRequestQrCode;
-        return __generator(this, function (_b) {
-            _a = request.query, address = _a.address, amount = _a.amount, message = _a.message;
-            paymentRequestQrCode = index_1.getPaymentRequestQrCode(address, amount, message);
+        var payload, paymentRequestQrCode;
+        return __generator(this, function (_a) {
+            payload = request.query.payload;
+            paymentRequestQrCode = index_1.getQrCodeImage(payload);
             response.setHeader("Content-Type", "image/png");
             paymentRequestQrCode.pipe(response);
             return [2 /*return*/];

@@ -4,8 +4,6 @@ import * as querystring from "querystring";
 import * as supertest from "supertest";
 import blockchainMiddleware, { Invoice } from "./";
 
-const RECEIVING_ADDRESS = "2FupTEd3PDF7HVxNrzNqQGGoWZA4rqiphq";
-
 // invoices "database" emulated with a simple array
 const invoiceDatabase: Invoice[] = [];
 
@@ -41,14 +39,11 @@ describe("middleware", () => {
   });
 
   it("should provide qr code rendering", async () => {
-    // build qr code url
-    const qrCodeParameters = {
-      address: RECEIVING_ADDRESS,
-      amount: 1,
-      message: "Test",
-    };
-
-    const response = await server.get(`/payment/qr?${querystring.stringify(qrCodeParameters)}`);
+    const response = await server.get(
+      `/payment/qr?${querystring.stringify({
+        payload: "bitcoin:bmitnJQ1OqzZzOGv6abovJxdO1PuSnqn?amount=0.00450000",
+      })}`,
+    );
 
     expect(response.type).toEqual("image/png");
     expect(response.body).toMatchSnapshot();

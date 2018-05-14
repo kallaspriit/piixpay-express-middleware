@@ -154,6 +154,7 @@ export interface IInvoiceInfo {
     due_date: string | null;
     qrc_image_url: string;
     qrc_endpoint_url: string;
+    payment_url: string;
     total_coin: number;
     fees_coin: number;
     bank_fees_coin: number;

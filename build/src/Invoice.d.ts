@@ -124,6 +124,10 @@ export default class Invoice {
      */
     readonly rate: number;
     /**
+     * Payment url getter.
+     */
+    readonly paymentUrl: string;
+    /**
      * Serializes the invoice.
      */
     toJSON(): {
@@ -161,6 +165,7 @@ export default class Invoice {
             coin: number;
         };
         rate: number;
+        paymentUrl: string;
         info: IInvoiceInfo;
     };
 }
