@@ -2,7 +2,7 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as querystring from "querystring";
 import * as supertest from "supertest";
-import blockchainMiddleware, { Invoice } from "./";
+import blockchainMiddleware, { Invoice, Piixpay } from "./";
 
 // invoices "database" emulated with a simple array
 const invoiceDatabase: Invoice[] = [];
@@ -23,8 +23,10 @@ describe("middleware", () => {
     app.use(
       "/payment",
       blockchainMiddleware({
+        api: new Piixpay({
+          key: "xxx",
+        }),
         saveInvoice,
-        loadInvoice,
       }),
     );
 
@@ -58,14 +60,4 @@ async function saveInvoice(invoice: Invoice): Promise<void> {
   } else {
     invoiceDatabase.push(invoice);
   }
-}
-
-async function loadInvoice(transactionKey: string): Promise<Invoice | undefined> {
-  const invoice = invoiceDatabase.find(item => item.transactionKey === transactionKey);
-
-  if (!invoice) {
-    return undefined;
-  }
-
-  return invoice;
 }

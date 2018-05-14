@@ -54,8 +54,10 @@ describe("middleware", function () {
         app.use(bodyParser.json());
         // use the blockchain middleware
         app.use("/payment", _1.default({
+            api: new _1.Piixpay({
+                key: "xxx",
+            }),
             saveInvoice: saveInvoice,
-            loadInvoice: loadInvoice,
         }));
         server = supertest(app);
     });
@@ -93,18 +95,6 @@ function saveInvoice(invoice) {
                 invoiceDatabase.push(invoice);
             }
             return [2 /*return*/];
-        });
-    });
-}
-function loadInvoice(transactionKey) {
-    return __awaiter(this, void 0, void 0, function () {
-        var invoice;
-        return __generator(this, function (_a) {
-            invoice = invoiceDatabase.find(function (item) { return item.transactionKey === transactionKey; });
-            if (!invoice) {
-                return [2 /*return*/, undefined];
-            }
-            return [2 /*return*/, invoice];
         });
     });
 }

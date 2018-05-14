@@ -77,8 +77,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // use the blockchain middleware
 app.use(src_1.default({
+    api: api,
     saveInvoice: saveInvoice,
-    loadInvoice: loadInvoice,
     log: console,
 }));
 // handle index view request
@@ -185,21 +185,18 @@ app.get("/invoice/:transactionKey", function (request, response, next) { return 
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 3, , 4]);
+                _a.trys.push([0, 2, , 3]);
                 return [4 /*yield*/, api.getInvoice(request.params.transactionKey)];
             case 1:
                 invoice = _a.sent();
-                return [4 /*yield*/, saveInvoice(invoice)];
-            case 2:
-                _a.sent();
                 qrCodeImageUrl = "/qr?" + querystring.stringify({ payload: invoice.paymentUrl });
                 response.send("\n      <h1>Invoice</h1>\n\n      <ul>\n        <li><strong>Transaction key:</strong> " + invoice.transactionKey + "</li>\n        <li><strong>Is complete:</strong> " + invoice.isComplete + "</li>\n        <li><strong>Receiver:</strong> " + invoice.receiver.name + " - " + invoice.receiver.iban + "</li>\n        <li><strong>Payment status:</strong> " + invoice.paymentStatus + "</li>\n        <li><strong>Amount status:</strong> " + invoice.amountStatus + "</li>\n        <li><strong>Amount:</strong> " + invoice.amount.eur + "\u20AC (" + invoice.amount.coin.toFixed(COIN_DECIMAL_PLACES) + " " + invoice.coin + ")</li>\n        <li><strong>Due:</strong> " + invoice.due.eur + "\u20AC (" + invoice.due.coin + " " + invoice.coin + ")</li>\n        <li><strong>Received:</strong> " + invoice.received.coin + " " + invoice.coin + " / " + invoice.due.coin + " " + invoice.coin + "</li>\n        <li><strong>Service fees:</strong> " + invoice.fees.service.eur + "\u20AC (" + invoice.fees.service.coin + " " + invoice.coin + ")</li>\n        <li><strong>Bank fees:</strong> " + invoice.fees.bank.eur + "\u20AC (" + invoice.fees.bank.coin + " " + invoice.coin + ")</li>\n        <li><strong>Total fees:</strong> " + invoice.fees.total.eur + "\u20AC (" + invoice.fees.total.coin + " " + invoice.coin + ")</li>\n        <li><strong>Rate:</strong> 1 " + invoice.coin + " = " + invoice.rate + "\u20AC</li>\n      </ul>\n\n      <img src=\"" + qrCodeImageUrl + "\"/>\n\n      <h2>Raw</h2>\n      <pre>" + JSON.stringify(invoice, undefined, "  ") + "</pre>\n    ");
-                return [3 /*break*/, 4];
-            case 3:
+                return [3 /*break*/, 3];
+            case 2:
                 error_2 = _a.sent();
                 next(error_2);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
 }); });
@@ -232,24 +229,13 @@ function saveInvoice(invoice) {
             existingInvoiceIndex = invoiceDatabase.findIndex(function (item) { return item.transactionKey === invoice.transactionKey; });
             if (existingInvoiceIndex !== -1) {
                 invoiceDatabase[existingInvoiceIndex] = invoice;
+                console.log({ invoice: invoice }, "updated invoice");
             }
             else {
                 invoiceDatabase.push(invoice);
+                console.log({ invoice: invoice }, "added invoice");
             }
             return [2 /*return*/];
-        });
-    });
-}
-// TODO: needed?
-function loadInvoice(transactionKey) {
-    return __awaiter(this, void 0, void 0, function () {
-        var invoice;
-        return __generator(this, function (_a) {
-            invoice = invoiceDatabase.find(function (item) { return item.transactionKey === transactionKey; });
-            if (!invoice) {
-                return [2 /*return*/, undefined];
-            }
-            return [2 /*return*/, invoice];
         });
     });
 }

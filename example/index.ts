@@ -48,8 +48,8 @@ app.use(bodyParser.json());
 // use the blockchain middleware
 app.use(
   blockchainMiddleware({
+    api,
     saveInvoice,
-    loadInvoice,
     log: console,
   }),
 );
@@ -169,9 +169,6 @@ app.post("/pay", async (request, response, next) => {
 app.get("/invoice/:transactionKey", async (request, response, next) => {
   try {
     const invoice = await api.getInvoice(request.params.transactionKey);
-
-    await saveInvoice(invoice);
-
     const qrCodeImageUrl = `/qr?${querystring.stringify({ payload: invoice.paymentUrl })}`;
 
     response.send(`
@@ -246,18 +243,11 @@ async function saveInvoice(invoice: Invoice): Promise<void> {
 
   if (existingInvoiceIndex !== -1) {
     invoiceDatabase[existingInvoiceIndex] = invoice;
+
+    console.log({ invoice }, "updated invoice");
   } else {
     invoiceDatabase.push(invoice);
+
+    console.log({ invoice }, "added invoice");
   }
-}
-
-// TODO: needed?
-async function loadInvoice(transactionKey: string): Promise<Invoice | undefined> {
-  const invoice = invoiceDatabase.find(item => item.transactionKey === transactionKey);
-
-  if (!invoice) {
-    return undefined;
-  }
-
-  return invoice;
 }

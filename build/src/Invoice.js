@@ -296,6 +296,8 @@ var Invoice = /** @class */ (function () {
     /**
      * Starts the automatic new info poller.
      *
+     * TODO: remove once callback logic gets implemented instead
+     *
      * @param api Api to use
      * @param callback Callback to call with new invoice info
      */

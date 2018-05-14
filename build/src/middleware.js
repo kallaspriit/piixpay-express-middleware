@@ -37,11 +37,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
+var HttpStatus = require("http-status-codes");
 var ts_log_1 = require("ts-log");
 var index_1 = require("./index");
 // export type InvoiceUpdateCallback = (error: Error | null, info?: IInvoiceInfo) => void;
 exports.default = (function (options) {
     var log = options.log !== undefined ? options.log : ts_log_1.dummyLogger;
+    var api = options.api;
     var router = express.Router();
     // handle qr image request
     router.get("/qr", function (request, response, _next) { return __awaiter(_this, void 0, void 0, function () {
@@ -56,38 +58,56 @@ exports.default = (function (options) {
     }); });
     // handle payment update request
     router.post("/handle-payment", function (request, response, _next) { return __awaiter(_this, void 0, void 0, function () {
+        var transactionKey, expectedTransactionKeyLength, invoice, error_1;
         return __generator(this, function (_a) {
-            log.info({
-                body: request.body,
-            }, "handling payment status");
-            response.send("ok");
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0:
+                    transactionKey = request.body.transaction_key;
+                    expectedTransactionKeyLength = 32;
+                    // make sure a valid-looking transaction key was provided
+                    if (typeof transactionKey !== "string" || transactionKey.length !== expectedTransactionKeyLength) {
+                        log.warn({
+                            body: request.body,
+                        }, "got invalid payment update request");
+                        // respond with bad request
+                        response
+                            .status(HttpStatus.BAD_REQUEST)
+                            .send("Expected request body to include 'transaction_key' with a string value of 32 characters");
+                        return [2 /*return*/];
+                    }
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 4, , 5]);
+                    return [4 /*yield*/, api.getInvoice(transactionKey)];
+                case 2:
+                    invoice = _a.sent();
+                    log.info({
+                        transactionKey: transactionKey,
+                        invoice: invoice,
+                        body: request.body,
+                    }, "got payment update");
+                    // save invoice
+                    return [4 /*yield*/, options.saveInvoice(invoice)];
+                case 3:
+                    // save invoice
+                    _a.sent();
+                    // respond with HTTP 200
+                    response.send("OK");
+                    return [3 /*break*/, 5];
+                case 4:
+                    error_1 = _a.sent();
+                    log.warn({
+                        error: error_1,
+                        transactionKey: transactionKey,
+                    }, "fetching invoice info failed");
+                    response
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .send("Fetching invoice \"" + transactionKey + "\" info failed (" + error_1.message + ")");
+                    return [3 /*break*/, 5];
+                case 5: return [2 /*return*/];
+            }
         });
     }); });
     return router;
 });
-// function startPolling(callback: InvoiceUpdateCallback) {
-//   const pollInterval = 10000; // TODO: based on age
-//   scheduleNextPoll((error, info) => {
-//     // tslint:disable-next-line:no-null-keyword
-//     callback(error, info);
-//     scheduleNextPoll(callback, pollInterval);
-//   }, pollInterval);
-// }
-// function scheduleNextPoll(callback: InvoiceUpdateCallback, timeout: number): NodeJS.Timer {
-//   return setTimeout(async () => {
-//     try {
-//       const info = await this.fetchCurrentInfo();
-//       // tslint:disable-next-line:no-null-keyword
-//       callback(null, info);
-//     } catch (error) {
-//       callback(error);
-//     }
-//   }, timeout);
-// }
-// function async fetchCurrentInfo(): Promise<IInvoiceInfo> {
-//   const info = {} as IInvoiceInfo;
-//   this.description = "updated";
-//   return info;
-// }
 //# sourceMappingURL=middleware.js.map

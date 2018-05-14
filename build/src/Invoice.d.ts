@@ -146,6 +146,8 @@ export default class Invoice {
     /**
      * Starts the automatic new info poller.
      *
+     * TODO: remove once callback logic gets implemented instead
+     *
      * @param api Api to use
      * @param callback Callback to call with new invoice info
      */
