@@ -12,6 +12,8 @@ export interface IOptions {
   loadInvoice(address: string): Promise<Invoice | undefined>;
 }
 
+// export type InvoiceUpdateCallback = (error: Error | null, info?: IInvoiceInfo) => void;
+
 export default (options: IOptions): express.Router => {
   const log = options.log !== undefined ? options.log : dummyLogger;
   const router = express.Router();
@@ -175,3 +177,35 @@ export default (options: IOptions): express.Router => {
 
   return router;
 };
+
+// function startPolling(callback: InvoiceUpdateCallback) {
+//   const pollInterval = 10000; // TODO: based on age
+
+//   scheduleNextPoll((error, info) => {
+//     // tslint:disable-next-line:no-null-keyword
+//     callback(error, info);
+
+//     scheduleNextPoll(callback, pollInterval);
+//   }, pollInterval);
+// }
+
+// function scheduleNextPoll(callback: InvoiceUpdateCallback, timeout: number): NodeJS.Timer {
+//   return setTimeout(async () => {
+//     try {
+//       const info = await this.fetchCurrentInfo();
+
+//       // tslint:disable-next-line:no-null-keyword
+//       callback(null, info);
+//     } catch (error) {
+//       callback(error);
+//     }
+//   }, timeout);
+// }
+
+// function async fetchCurrentInfo(): Promise<IInvoiceInfo> {
+//   const info = {} as IInvoiceInfo;
+
+//   this.description = "updated";
+
+//   return info;
+// }

@@ -107,6 +107,14 @@ app.get("/", async (_request, response, _next) => {
   `);
 });
 
+// function difference(object: Dictionary<{}>, base: Dictionary<{}>) {
+//   return transform(object, (result, value, key) => {
+//     if (!isEqual(value, base[key])) {
+//       result[key] = isObject(value) && isObject(base[key]) ? difference(value, base[key]) : value;
+//     }
+//   });
+// }
+
 // handle payment form request
 app.post("/pay", async (request, response, next) => {
   // extract invoice info from the request payment form (you'd normally want to validate these)
@@ -120,8 +128,35 @@ app.post("/pay", async (request, response, next) => {
       coin,
     });
 
+    // let lastInvoice = invoice;
+
+    // // start polling for updates
+    // invoice.startPolling(api, (error, updatedInvoice) => {
+    //   if (!updatedInvoice || error !== null) {
+    //     console.error({ error }, "failed to get invoice info");
+
+    //     return;
+    //   }
+
+    //   const hasInvoiceChanged = !lastInvoice.isSameAs(updatedInvoice);
+    //   const invoiceDifference = difference(invoice.toJSON(), updatedInvoice.toJSON());
+
+    //   lastInvoice = updatedInvoice;
+
+    //   console.log(
+    //     {
+    //       error,
+    //       hasInvoiceChanged,
+    //       invoiceDifference,
+    //       lastInvoice,
+    //       updatedInvoice,
+    //     },
+    //     "got invoice poll result",
+    //   );
+    // });
+
     // save the invoice (this would normally hit an actual database)
-    // await saveInvoice(invoice);
+    await saveInvoice(invoice);
 
     // redirect user to invoice view (use address as unique id)
     response.redirect(`/invoice/${invoice.transactionKey}`);

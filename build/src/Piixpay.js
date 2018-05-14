@@ -192,27 +192,29 @@ var Piixpay = /** @class */ (function () {
         if (method === void 0) { method = RequestMethod.GET; }
         if (options === void 0) { options = {}; }
         return __awaiter(this, void 0, void 0, function () {
-            var startTime, response, timeTaken, error_1;
+            var response, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        startTime = Date.now();
                         return [4 /*yield*/, axios_1.default.request(__assign({ baseURL: this.config.baseUrl, method: method,
                                 url: url,
                                 data: data }, options))];
                     case 1:
                         response = _a.sent();
-                        timeTaken = Date.now() - startTime;
-                        this.log.debug({
-                            url: url,
-                            method: method,
-                            status: response.status,
-                            statusText: response.statusText,
-                            data: data,
-                            response: response.data,
-                            timeTaken: timeTaken,
-                        }, "request completed");
+                        // const timeTaken = Date.now() - startTime;
+                        // this.log.debug(
+                        //   {
+                        //     url,
+                        //     method,
+                        //     status: response.status,
+                        //     statusText: response.statusText,
+                        //     data,
+                        //     response: response.data,
+                        //     timeTaken,
+                        //   },
+                        //   "request completed",
+                        // );
                         return [2 /*return*/, response.data];
                     case 2:
                         error_1 = _a.sent();

@@ -1,4 +1,4 @@
-import { Coin, IInvoiceInfo } from "./index";
+import { Coin, IInvoiceInfo, Piixpay } from "./index";
 /**
  * Enumeration of possible invoice statuses.
  *
@@ -35,10 +35,18 @@ export interface IReceiverInfo {
     address: string | null;
 }
 /**
+ * Invoice update callback.
+ */
+export declare type InvoiceUpdateCallback = (error: Error | null, info?: Invoice) => void;
+/**
  * Represents an invoice.
  */
 export default class Invoice {
     private readonly info;
+    /**
+     * Latest polling timer.
+     */
+    private pollTimeout;
     /**
      * Constructs the invoice.
      *
@@ -73,6 +81,14 @@ export default class Invoice {
      * The invoice might be under or overpaid.
      */
     readonly amountStatus: InvoiceAmountStatus;
+    /**
+     * Created date getter.
+     */
+    readonly createdDate: Date;
+    /**
+     * Updated date getter.
+     */
+    readonly updatedDate: Date;
     /**
      * Coin symbol getter.
      */
@@ -127,6 +143,23 @@ export default class Invoice {
      * Payment url getter.
      */
     readonly paymentUrl: string;
+    /**
+     * Starts the automatic new info poller.
+     *
+     * @param api Api to use
+     * @param callback Callback to call with new invoice info
+     */
+    startPolling(api: Piixpay, callback: InvoiceUpdateCallback): void;
+    /**
+     * Ends polling if running.
+     */
+    endPolling(): void;
+    /**
+     * Returns whether current invoice has the same contents as the provided invoice.
+     *
+     * @param anotherInvoice Another invoice to compare to
+     */
+    isSameAs(anotherInvoice: Invoice): boolean;
     /**
      * Serializes the invoice.
      */

@@ -79,6 +79,7 @@ app.use(bodyParser.json());
 app.use(src_1.default({
     saveInvoice: saveInvoice,
     loadInvoice: loadInvoice,
+    log: console,
 }));
 // handle index view request
 app.get("/", function (_request, response, _next) { return __awaiter(_this, void 0, void 0, function () {
@@ -96,6 +97,13 @@ app.get("/", function (_request, response, _next) { return __awaiter(_this, void
         }
     });
 }); });
+// function difference(object: Dictionary<{}>, base: Dictionary<{}>) {
+//   return transform(object, (result, value, key) => {
+//     if (!isEqual(value, base[key])) {
+//       result[key] = isObject(value) && isObject(base[key]) ? difference(value, base[key]) : value;
+//     }
+//   });
+// }
 // handle payment form request
 app.post("/pay", function (request, response, next) { return __awaiter(_this, void 0, void 0, function () {
     var _a, sum_eur, description, coin, invoice, error_1;
@@ -105,7 +113,7 @@ app.post("/pay", function (request, response, next) { return __awaiter(_this, vo
                 _a = request.body, sum_eur = _a.sum_eur, description = _a.description, coin = _a.coin;
                 _b.label = 1;
             case 1:
-                _b.trys.push([1, 3, , 4]);
+                _b.trys.push([1, 4, , 5]);
                 return [4 /*yield*/, api.createInvoice({
                         sum_eur: sum_eur,
                         description: description,
@@ -113,16 +121,61 @@ app.post("/pay", function (request, response, next) { return __awaiter(_this, vo
                     })];
             case 2:
                 invoice = _b.sent();
+                // let lastInvoice = invoice;
+                // // start polling for updates
+                // invoice.startPolling(api, (error, updatedInvoice) => {
+                //   if (!updatedInvoice || error !== null) {
+                //     console.error({ error }, "failed to get invoice info");
+                //     return;
+                //   }
+                //   const hasInvoiceChanged = !lastInvoice.isSameAs(updatedInvoice);
+                //   const invoiceDifference = difference(invoice.toJSON(), updatedInvoice.toJSON());
+                //   lastInvoice = updatedInvoice;
+                //   console.log(
+                //     {
+                //       error,
+                //       hasInvoiceChanged,
+                //       invoiceDifference,
+                //       lastInvoice,
+                //       updatedInvoice,
+                //     },
+                //     "got invoice poll result",
+                //   );
+                // });
                 // save the invoice (this would normally hit an actual database)
-                // await saveInvoice(invoice);
+                return [4 /*yield*/, saveInvoice(invoice)];
+            case 3:
+                // let lastInvoice = invoice;
+                // // start polling for updates
+                // invoice.startPolling(api, (error, updatedInvoice) => {
+                //   if (!updatedInvoice || error !== null) {
+                //     console.error({ error }, "failed to get invoice info");
+                //     return;
+                //   }
+                //   const hasInvoiceChanged = !lastInvoice.isSameAs(updatedInvoice);
+                //   const invoiceDifference = difference(invoice.toJSON(), updatedInvoice.toJSON());
+                //   lastInvoice = updatedInvoice;
+                //   console.log(
+                //     {
+                //       error,
+                //       hasInvoiceChanged,
+                //       invoiceDifference,
+                //       lastInvoice,
+                //       updatedInvoice,
+                //     },
+                //     "got invoice poll result",
+                //   );
+                // });
+                // save the invoice (this would normally hit an actual database)
+                _b.sent();
                 // redirect user to invoice view (use address as unique id)
                 response.redirect("/invoice/" + invoice.transactionKey);
-                return [3 /*break*/, 4];
-            case 3:
+                return [3 /*break*/, 5];
+            case 4:
                 error_1 = _b.sent();
                 next(error_1);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); });

@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var ts_log_1 = require("ts-log");
 var index_1 = require("./index");
+// export type InvoiceUpdateCallback = (error: Error | null, info?: IInvoiceInfo) => void;
 exports.default = (function (options) {
     var log = options.log !== undefined ? options.log : ts_log_1.dummyLogger;
     var router = express.Router();
@@ -54,7 +55,7 @@ exports.default = (function (options) {
         });
     }); });
     // handle payment update request
-    router.get("/handle-payment", function (request, response, _next) { return __awaiter(_this, void 0, void 0, function () {
+    router.post("/handle-payment", function (request, response, _next) { return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             log.info({
                 body: request.body,
@@ -65,4 +66,28 @@ exports.default = (function (options) {
     }); });
     return router;
 });
+// function startPolling(callback: InvoiceUpdateCallback) {
+//   const pollInterval = 10000; // TODO: based on age
+//   scheduleNextPoll((error, info) => {
+//     // tslint:disable-next-line:no-null-keyword
+//     callback(error, info);
+//     scheduleNextPoll(callback, pollInterval);
+//   }, pollInterval);
+// }
+// function scheduleNextPoll(callback: InvoiceUpdateCallback, timeout: number): NodeJS.Timer {
+//   return setTimeout(async () => {
+//     try {
+//       const info = await this.fetchCurrentInfo();
+//       // tslint:disable-next-line:no-null-keyword
+//       callback(null, info);
+//     } catch (error) {
+//       callback(error);
+//     }
+//   }, timeout);
+// }
+// function async fetchCurrentInfo(): Promise<IInvoiceInfo> {
+//   const info = {} as IInvoiceInfo;
+//   this.description = "updated";
+//   return info;
+// }
 //# sourceMappingURL=middleware.js.map

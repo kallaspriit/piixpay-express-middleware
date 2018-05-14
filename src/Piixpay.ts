@@ -287,7 +287,7 @@ export default class Piixpay {
   ): Promise<T> {
     // attempt to fetch rates (throws for non 2xx response)
     try {
-      const startTime = Date.now();
+      // const startTime = Date.now();
       const response = await Axios.request<T>({
         baseURL: this.config.baseUrl,
         method,
@@ -295,20 +295,20 @@ export default class Piixpay {
         data,
         ...options,
       });
-      const timeTaken = Date.now() - startTime;
+      // const timeTaken = Date.now() - startTime;
 
-      this.log.debug(
-        {
-          url,
-          method,
-          status: response.status,
-          statusText: response.statusText,
-          data,
-          response: response.data,
-          timeTaken,
-        },
-        "request completed",
-      );
+      // this.log.debug(
+      //   {
+      //     url,
+      //     method,
+      //     status: response.status,
+      //     statusText: response.statusText,
+      //     data,
+      //     response: response.data,
+      //     timeTaken,
+      //   },
+      //   "request completed",
+      // );
 
       return response.data;
     } catch (error) {
