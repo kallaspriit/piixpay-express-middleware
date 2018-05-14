@@ -28,7 +28,7 @@ export default (options: IOptions): express.Router => {
   });
 
   // handle payment update request
-  router.get("/handle-payment", async (request, response, _next) => {
+  router.post("/handle-payment", async (request, response, _next) => {
     log.info(
       {
         body: request.body,

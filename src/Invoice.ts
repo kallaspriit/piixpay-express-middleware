@@ -200,7 +200,7 @@ export default class Invoice {
    * Payment url getter.
    */
   public get paymentUrl() {
-    return this.info.payment_url.replace("://", ":");
+    return this.info.payment_url;
   }
 
   /**
