@@ -84,6 +84,15 @@ app.get("/", async (_request, response, _next) => {
         Coin
       </p>
       <p>
+        <input type="text" name="contact_email" value="test@example.com" /> Contact email
+      </p>
+      <p>
+        <input type="text" name="payer_name" value="John Rambo" /> Payer name
+      </p>
+      <p>
+        <input type="text" name="payer_document" value="019ae981-713f-4eb8-860f-c11d48f29a1c" /> Payer identifier
+      </p>
+      <p>
         <input type="submit" name="submit" value="Request payment" />
       </p>
     </form>
@@ -116,7 +125,7 @@ app.get("/", async (_request, response, _next) => {
 // handle payment form request
 app.post("/pay", async (request, response, next) => {
   // extract invoice info from the request payment form (you'd normally want to validate these)
-  const { sum_eur, description, coin } = request.body;
+  const { sum_eur, description, coin, contact_email, payer_name, payer_document } = request.body;
 
   try {
     // create invoice
@@ -124,6 +133,9 @@ app.post("/pay", async (request, response, next) => {
       sum_eur,
       description,
       coin,
+      contact_email,
+      payer_name,
+      payer_document,
     });
 
     // save the invoice (this would normally hit an actual database)
@@ -157,6 +169,10 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
         <li>
           <strong>Receiver:</strong>
           ${invoice.receiver.name} - ${invoice.receiver.iban}
+        </li>
+        <li>
+          <strong>Payer:</strong>
+          ${invoice.payer.name} - ${invoice.payer.email} (${invoice.payer.document})
         </li>
         <li>
           <strong>Is paid:</strong>

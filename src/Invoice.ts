@@ -39,6 +39,15 @@ export interface IReceiverInfo {
 }
 
 /**
+ * Payer info.
+ */
+export interface IPayerInfo {
+  name: string | null;
+  document: string | null;
+  email: string | null;
+}
+
+/**
  * Invoice update callback.
  */
 export type InvoiceUpdateCallback = (error: Error | null, info?: Invoice) => void;
@@ -100,6 +109,17 @@ export default class Invoice {
       name: this.info.receiver_name,
       iban: this.info.receiver_iban,
       address: this.info.receiver_address,
+    };
+  }
+
+  /**
+   * Payer info getter.
+   */
+  public get payer(): IPayerInfo {
+    return {
+      name: this.info.payer_name,
+      document: this.info.payer_document,
+      email: this.info.contact_email,
     };
   }
 
@@ -246,6 +266,7 @@ export default class Invoice {
       transactionKey: this.transactionKey,
       isComplete: this.isComplete,
       receiver: this.receiver,
+      payer: this.payer,
       paymentStatus: this.paymentStatus,
       amountStatus: this.amountStatus,
       coin: this.coin,
