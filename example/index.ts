@@ -5,7 +5,7 @@ import * as fs from "fs";
 import * as http from "http";
 import * as https from "https";
 import * as querystring from "querystring";
-import blockchainMiddleware, { Coin, Invoice, Piixpay } from "../src";
+import blockchainMiddleware, { Coin, Invoice, IRatesResponse, Piixpay } from "../src";
 
 // load the .env configuration (https://github.com/motdotla/dotenv)
 dotenv.config();
@@ -55,7 +55,13 @@ app.use(
 
 // handle index view request
 app.get("/", async (_request, response, _next) => {
-  const rates = await api.getRates();
+  let rates: IRatesResponse | undefined;
+
+  try {
+    rates = await api.getRates();
+  } catch (error) {
+    console.warn({ error }, "fetching rates failed");
+  }
 
   // show request payment form and list of existing payments
   response.send(`
@@ -103,7 +109,7 @@ app.get("/", async (_request, response, _next) => {
     </ul>
 
     <h2>Rates</h2>
-    <pre>${JSON.stringify(rates, undefined, "  ")}</pre>
+    <pre>${JSON.stringify(rates || "fetching rates failed", undefined, "  ")}</pre>
   `);
 });
 
@@ -145,6 +151,10 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
           ${invoice.transactionKey}
         </li>
         <li>
+          <strong>Description:</strong>
+          ${invoice.description}
+        </li>
+        <li>
           <strong>Receiver:</strong>
           ${invoice.receiver.name} - ${invoice.receiver.iban}
         </li>
@@ -157,7 +167,7 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
         </li>
         <li>
           <strong>Payment status:</strong>
-          ${invoice.paymentStatus}
+          ${invoice.paymentStatus} (${invoice.toJSON().info.status})
         </li>
         <li>
           <strong>Amount status:</strong>
