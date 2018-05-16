@@ -14,7 +14,7 @@
 - Written in TypeScript, no need for extra typings.
 - Supports creating invoices, getting invoice info, getting rates.
 
-![Example application](https://raw.githubusercontent.com/kallaspriit/piixpay-express-middleware/master/example/screenshot.jpg)
+![Example application](https://raw.githubusercontent.com/kallaspriit/piixpay-express-middleware/master/example/example.gif)
 
 ## Installation
 
