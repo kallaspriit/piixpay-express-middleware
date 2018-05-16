@@ -1,5 +1,59 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`middleware should handle valid payment updates 1`] = `"OK"`;
+
+exports[`middleware should handle valid payment updates 2`] = `
+Array [
+  Object {
+    "amount": Object {
+      "coin": 0.0006825537886513146,
+      "eur": 5,
+    },
+    "amountStatus": "EXACT",
+    "coin": "BTC",
+    "description": "Test payment",
+    "due": Object {
+      "coin": 0.0043,
+      "eur": 30.05,
+    },
+    "fees": Object {
+      "bank": Object {
+        "coin": 0.0035,
+        "eur": 25,
+      },
+      "service": Object {
+        "coin": 0.0001,
+        "eur": 0.05,
+      },
+      "total": Object {
+        "coin": 0.0036,
+        "eur": 25.05,
+      },
+    },
+    "isComplete": true,
+    "isPaid": true,
+    "payer": Object {
+      "document": "019ae981-713f-4eb8-860f-c11d48f29a1c",
+      "email": "test@example.com",
+      "name": "John Rambo",
+    },
+    "paymentStatus": "FULL",
+    "paymentUrl": "bitcoin://iURIGqIuMNu2W2H89jOqqXmbu3RmdBz5?amount=0.00430000",
+    "rate": 7325.43,
+    "received": Object {
+      "coin": 0.0043,
+      "eur": 31.499349000000002,
+    },
+    "receiver": Object {
+      "address": null,
+      "iban": "DA12345EFAEJBF242424524",
+      "name": "Dag University",
+    },
+    "transactionKey": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  },
+]
+`;
+
 exports[`middleware should provide qr code rendering 1`] = `
 Object {
   "data": Array [
@@ -551,3 +605,13 @@ Object {
   "type": "Buffer",
 }
 `;
+
+exports[`middleware should return bad request if the transaction key does not have correct format 1`] = `"Expected request body to include 'transaction_key' with a string value of 32 characters"`;
+
+exports[`middleware should return bad request if the transaction key is missing 1`] = `"Expected request body to include 'transaction_key' with a string value of 32 characters"`;
+
+exports[`middleware should return internal error if the remote api fails, includes error data if a string is provided 1`] = `"Fetching invoice \\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\" info failed (remote error message)"`;
+
+exports[`middleware should return internal error if the remote api fails, uses error if no data is provided 1`] = `"Fetching invoice \\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\" info failed (Request failed with status code 500)"`;
+
+exports[`middleware should return not found if the invoice could not be found 1`] = `"Invoice \\"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy\\" could not be found (Request failed with status code 404)"`;

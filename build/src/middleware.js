@@ -57,7 +57,7 @@ exports.default = (function (options) {
     }); });
     // handle payment update request
     router.post("/handle-payment", function (request, response, _next) { return __awaiter(_this, void 0, void 0, function () {
-        var transactionKey, expectedTransactionKeyLength, invoice, error_1;
+        var transactionKey, expectedTransactionKeyLength, invoice, e_1, error, reason;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -94,14 +94,25 @@ exports.default = (function (options) {
                     response.send("OK");
                     return [3 /*break*/, 5];
                 case 4:
-                    error_1 = _a.sent();
+                    e_1 = _a.sent();
+                    error = e_1;
+                    reason = error.response !== undefined && typeof error.response.data === "string" && error.response.data.length > 0
+                        ? error.response.data
+                        : error.message;
                     log.warn({
-                        error: error_1,
+                        error: error,
+                        reason: reason,
                         transactionKey: transactionKey,
                     }, "fetching invoice info failed");
+                    // handle not found
+                    if (error.response && error.response.status === HttpStatus.NOT_FOUND) {
+                        response.status(HttpStatus.NOT_FOUND).send("Invoice \"" + transactionKey + "\" could not be found (" + reason + ")");
+                        return [2 /*return*/];
+                    }
+                    // respond with internal error for all other issues
                     response
                         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .send("Fetching invoice \"" + transactionKey + "\" info failed (" + error_1.message + ")");
+                        .send("Fetching invoice \"" + transactionKey + "\" info failed (" + reason + ")");
                     return [3 /*break*/, 5];
                 case 5: return [2 /*return*/];
             }

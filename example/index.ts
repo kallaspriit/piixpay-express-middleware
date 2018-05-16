@@ -57,6 +57,7 @@ app.use(
 app.get("/", async (_request, response, _next) => {
   let rates: IRatesResponse | undefined;
 
+  // attempt to fetch rates
   try {
     rates = await api.getRates();
   } catch (error) {
@@ -118,7 +119,7 @@ app.get("/", async (_request, response, _next) => {
     </ul>
 
     <h2>Rates</h2>
-    <pre>${JSON.stringify(rates || "fetching rates failed", undefined, "  ")}</pre>
+    <pre>${JSON.stringify(rates ? rates : "fetching rates failed", undefined, "  ")}</pre>
   `);
 });
 
@@ -183,7 +184,7 @@ app.get("/invoice/:transactionKey", async (request, response, next) => {
         </li>
         <li>
           <strong>Payment status:</strong>
-          ${invoice.paymentStatus} (${invoice.toJSON().info.status})
+          ${invoice.paymentStatus}
         </li>
         <li>
           <strong>Amount status:</strong>

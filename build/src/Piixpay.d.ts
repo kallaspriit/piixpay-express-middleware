@@ -61,25 +61,6 @@ export interface ICommonResponse {
     desc?: string;
 }
 /**
- * Login response data.
- */
-export interface ILoginResponse extends ICommonResponse {
-    session_key: string;
-    session_expires_utctime: string;
-    session_expires_utime: number;
-    session_is_permanent: boolean;
-    server_utctime: string;
-    server_utime: number;
-    merchant_key: string;
-    merchant_name: string;
-    user_first_name: string | null;
-    user_family_name: string | null;
-    prm: {
-        pos: boolean;
-        settle: boolean;
-    };
-}
-/**
  * Represents rate info
  */
 export interface IRate {
@@ -112,11 +93,11 @@ export interface ICreateInvoiceRequest {
     coin?: Coin;
     description: string;
     reference?: string;
-    contact_email?: string;
+    contact_email: string;
     contact_phone?: string;
     contact_language?: string;
-    payer_name?: string;
-    payer_document?: string;
+    payer_name: string;
+    payer_document: string;
     due_date?: string;
 }
 /**

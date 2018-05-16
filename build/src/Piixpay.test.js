@@ -129,16 +129,8 @@ describe("Blockchain", function () {
     //   expect((mockLogger.info as any).mock.calls).toMatchSnapshot();
     // });
 });
-// export function processInvoiceForSnapshot<T extends Invoice | IInvoice>(invoice: T): T {
-//   invoice.createdDate = new Date("2018-04-19T13:48:05.316Z");
-//   invoice.updatedDate = new Date("2018-04-20T13:48:05.316Z");
-//   invoice.transactions.forEach(transaction => {
-//     transaction.createdDate = new Date("2018-04-19T13:48:05.316Z");
-//     transaction.updatedDate = new Date("2018-04-20T13:48:05.316Z");
-//   });
-//   invoice.stateTransitions.forEach(stateTransition => {
-//     stateTransition.date = new Date("2018-04-21T13:48:05.316Z");
-//   });
-//   return invoice;
-// }
+function processInvoiceForSnapshot(invoice) {
+    return invoice;
+}
+exports.processInvoiceForSnapshot = processInvoiceForSnapshot;
 //# sourceMappingURL=Piixpay.test.js.map

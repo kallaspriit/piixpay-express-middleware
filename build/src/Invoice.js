@@ -100,6 +100,20 @@ var Invoice = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Invoice.prototype, "payer", {
+        /**
+         * Payer info getter.
+         */
+        get: function () {
+            return {
+                name: this.info.payer_name,
+                document: this.info.payer_document,
+                email: this.info.contact_email,
+            };
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Invoice.prototype, "paymentStatus", {
         /**
          * Invoice payment status getter.
@@ -276,8 +290,10 @@ var Invoice = /** @class */ (function () {
     Invoice.prototype.toJSON = function () {
         return {
             transactionKey: this.transactionKey,
+            isPaid: this.isPaid,
             isComplete: this.isComplete,
             receiver: this.receiver,
+            payer: this.payer,
             paymentStatus: this.paymentStatus,
             amountStatus: this.amountStatus,
             coin: this.coin,
@@ -288,7 +304,6 @@ var Invoice = /** @class */ (function () {
             received: this.received,
             rate: this.rate,
             paymentUrl: this.paymentUrl,
-            info: this.info,
         };
     };
     return Invoice;

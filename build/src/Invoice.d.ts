@@ -35,6 +35,14 @@ export interface IReceiverInfo {
     address: string | null;
 }
 /**
+ * Payer info.
+ */
+export interface IPayerInfo {
+    name: string | null;
+    document: string | null;
+    email: string | null;
+}
+/**
  * Invoice update callback.
  */
 export declare type InvoiceUpdateCallback = (error: Error | null, info?: Invoice) => void;
@@ -69,6 +77,10 @@ export default class Invoice {
      * Receiver info getter.
      */
     readonly receiver: IReceiverInfo;
+    /**
+     * Payer info getter.
+     */
+    readonly payer: IPayerInfo;
     /**
      * Invoice payment status getter.
      *
@@ -148,8 +160,10 @@ export default class Invoice {
      */
     toJSON(): {
         transactionKey: string;
+        isPaid: boolean;
         isComplete: boolean;
         receiver: IReceiverInfo;
+        payer: IPayerInfo;
         paymentStatus: InvoicePaymentStatus;
         amountStatus: InvoiceAmountStatus;
         coin: Coin;
@@ -182,6 +196,5 @@ export default class Invoice {
         };
         rate: number;
         paymentUrl: string;
-        info: IInvoiceInfo;
     };
 }

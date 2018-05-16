@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import * as express from "express";
 import * as HttpStatus from "http-status-codes";
 import { dummyLogger, ILogger } from "ts-log";
@@ -74,18 +75,33 @@ export default (options: IOptions): express.Router => {
 
       // respond with HTTP 200
       response.send("OK");
-    } catch (error) {
+    } catch (e) {
+      const error: AxiosError = e;
+      const reason =
+        error.response !== undefined && typeof error.response.data === "string" && error.response.data.length > 0
+          ? error.response.data
+          : error.message;
+
       log.warn(
         {
           error,
+          reason,
           transactionKey,
         },
         "fetching invoice info failed",
       );
 
+      // handle not found
+      if (error.response && error.response.status === HttpStatus.NOT_FOUND) {
+        response.status(HttpStatus.NOT_FOUND).send(`Invoice "${transactionKey}" could not be found (${reason})`);
+
+        return;
+      }
+
+      // respond with internal error for all other issues
       response
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .send(`Fetching invoice "${transactionKey}" info failed (${error.message})`);
+        .send(`Fetching invoice "${transactionKey}" info failed (${reason})`);
     }
   });
 

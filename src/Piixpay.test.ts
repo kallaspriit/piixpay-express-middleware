@@ -1,5 +1,6 @@
 import Axios from "axios";
 import MockServer from "axios-mock-adapter";
+import { Invoice } from "./index";
 // import * as HttpStatus from "http-status-codes";
 // import { ILogger } from "ts-log";
 
@@ -110,18 +111,6 @@ describe("Blockchain", () => {
   // });
 });
 
-// export function processInvoiceForSnapshot<T extends Invoice | IInvoice>(invoice: T): T {
-//   invoice.createdDate = new Date("2018-04-19T13:48:05.316Z");
-//   invoice.updatedDate = new Date("2018-04-20T13:48:05.316Z");
-
-//   invoice.transactions.forEach(transaction => {
-//     transaction.createdDate = new Date("2018-04-19T13:48:05.316Z");
-//     transaction.updatedDate = new Date("2018-04-20T13:48:05.316Z");
-//   });
-
-//   invoice.stateTransitions.forEach(stateTransition => {
-//     stateTransition.date = new Date("2018-04-21T13:48:05.316Z");
-//   });
-
-//   return invoice;
-// }
+export function processInvoiceForSnapshot(invoice: Invoice): Invoice {
+  return invoice;
+}

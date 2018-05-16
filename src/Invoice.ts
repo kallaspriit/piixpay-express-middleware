@@ -264,6 +264,7 @@ export default class Invoice {
   public toJSON() {
     return {
       transactionKey: this.transactionKey,
+      isPaid: this.isPaid,
       isComplete: this.isComplete,
       receiver: this.receiver,
       payer: this.payer,
@@ -277,7 +278,7 @@ export default class Invoice {
       received: this.received,
       rate: this.rate,
       paymentUrl: this.paymentUrl,
-      info: this.info,
+      // info: this.info,
     };
   }
 }
