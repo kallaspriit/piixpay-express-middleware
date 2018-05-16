@@ -26,8 +26,6 @@ const config = {
   },
   api: {
     key: process.env.API_KEY !== undefined ? process.env.API_KEY : "",
-    username: process.env.API_USERNAME !== undefined ? process.env.API_USERNAME : "",
-    password: process.env.API_PASSWORD !== undefined ? process.env.API_PASSWORD : "",
   },
 };
 
