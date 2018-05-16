@@ -150,6 +150,38 @@ describe("middleware", function () {
             }
         });
     }); });
+    it("should handle underpayment", function () { return __awaiter(_this, void 0, void 0, function () {
+        var invoice, response, updatedInvoice;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    invoice = new _1.Invoice(getMockInvoiceInfo());
+                    invoiceDatabase.push(invoice);
+                    // mock get invoice response
+                    mockServer.onGet(/invoice/).reply(HttpStatus.OK, {
+                        ok: true,
+                        invoice: getMockInvoiceInfo({
+                            status: _1.PiixpayInvoiceStatus.F,
+                            received_coin: invoice.due.coin * 0.5,
+                        }),
+                    });
+                    return [4 /*yield*/, server.post("/payment/handle-payment").send({
+                            transaction_key: invoice.transactionKey,
+                        })];
+                case 1:
+                    response = _a.sent();
+                    expect(response.status).toEqual(HttpStatus.OK);
+                    expect(response.text).toMatchSnapshot();
+                    updatedInvoice = invoiceDatabase[0];
+                    expect(updatedInvoice.isPaid).toBe(true);
+                    expect(updatedInvoice.isComplete).toBe(true);
+                    expect(updatedInvoice.paymentStatus).toBe(_1.InvoicePaymentStatus.FULL);
+                    expect(updatedInvoice.amountStatus).toBe(_1.InvoiceAmountStatus.UNDERPAID);
+                    expect(processInvoicesDatabaseForSnapshot(invoiceDatabase)).toMatchSnapshot();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
     it("should return bad request if the transaction key is missing", function () { return __awaiter(_this, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {

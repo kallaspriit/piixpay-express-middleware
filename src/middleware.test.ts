@@ -119,6 +119,68 @@ describe("middleware", () => {
     expect(processInvoicesDatabaseForSnapshot(invoiceDatabase)).toMatchSnapshot();
   });
 
+  it("should handle underpayment", async () => {
+    const invoice = new Invoice(getMockInvoiceInfo());
+
+    invoiceDatabase.push(invoice);
+
+    // mock get invoice response
+    mockServer.onGet(/invoice/).reply(HttpStatus.OK, {
+      ok: true,
+      invoice: getMockInvoiceInfo({
+        status: PiixpayInvoiceStatus.F,
+        received_coin: invoice.due.coin * 0.5, // lower amount
+      }),
+    });
+
+    const response = await server.post(`/payment/handle-payment`).send({
+      transaction_key: invoice.transactionKey,
+    });
+
+    expect(response.status).toEqual(HttpStatus.OK);
+    expect(response.text).toMatchSnapshot();
+
+    const updatedInvoice = invoiceDatabase[0];
+
+    expect(updatedInvoice.isPaid).toBe(true);
+    expect(updatedInvoice.isComplete).toBe(true);
+    expect(updatedInvoice.paymentStatus).toBe(InvoicePaymentStatus.FULL);
+    expect(updatedInvoice.amountStatus).toBe(InvoiceAmountStatus.UNDERPAID);
+
+    expect(processInvoicesDatabaseForSnapshot(invoiceDatabase)).toMatchSnapshot();
+  });
+
+  it("should handle overpayment", async () => {
+    const invoice = new Invoice(getMockInvoiceInfo());
+
+    invoiceDatabase.push(invoice);
+
+    // mock get invoice response
+    mockServer.onGet(/invoice/).reply(HttpStatus.OK, {
+      ok: true,
+      invoice: getMockInvoiceInfo({
+        status: PiixpayInvoiceStatus.F,
+        received_coin: invoice.due.coin * 2, // higher amount
+      }),
+    });
+
+    const response = await server.post(`/payment/handle-payment`).send({
+      transaction_key: invoice.transactionKey,
+    });
+
+    expect(response.status).toEqual(HttpStatus.OK);
+    expect(response.text).toMatchSnapshot();
+
+    const updatedInvoice = invoiceDatabase[0];
+
+    expect(updatedInvoice.isPaid).toBe(true);
+    expect(updatedInvoice.isComplete).toBe(true);
+    expect(updatedInvoice.paymentStatus).toBe(InvoicePaymentStatus.FULL);
+    expect(updatedInvoice.amountStatus).toBe(InvoiceAmountStatus.OVERPAID);
+
+    expect(processInvoicesDatabaseForSnapshot(invoiceDatabase)).toMatchSnapshot();
+  });
+
   it("should return bad request if the transaction key is missing", async () => {
     const response = await server.post(`/payment/handle-payment`).send({
       // no transaction key

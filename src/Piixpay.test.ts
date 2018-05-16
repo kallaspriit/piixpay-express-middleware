@@ -112,5 +112,8 @@ describe("Blockchain", () => {
 });
 
 export function processInvoiceForSnapshot(invoice: Invoice): Invoice {
+  invoice.info.created_time = new Date(0).toISOString();
+  invoice.info.status_time = new Date(0).toISOString();
+
   return invoice;
 }

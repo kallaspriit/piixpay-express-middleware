@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "attach",
-      "name": "Attack to existing server",
+      "name": "Attatch to existing server",
       "port": 9229
     },
     {

@@ -63,7 +63,7 @@ export default class Invoice {
    *
    * @param info Invoice constructor info or serialized invoice info
    */
-  public constructor(private readonly info: IInvoiceInfo) {}
+  public constructor(public readonly info: IInvoiceInfo) {}
 
   // public startMonitor(api: Piixpay) {}
 
@@ -278,6 +278,8 @@ export default class Invoice {
       received: this.received,
       rate: this.rate,
       paymentUrl: this.paymentUrl,
+      createdDate: this.createdDate,
+      updatedDate: this.updatedDate,
       // info: this.info,
     };
   }
