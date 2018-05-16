@@ -52,7 +52,6 @@ var HttpStatus = require("http-status-codes");
 var querystring = require("querystring");
 var supertest = require("supertest");
 var _1 = require("./");
-var Piixpay_test_1 = require("./Piixpay.test");
 // invoices "database" emulated with a simple array
 var invoiceDatabase = [];
 var server;
@@ -182,6 +181,38 @@ describe("middleware", function () {
             }
         });
     }); });
+    it("should handle overpayment", function () { return __awaiter(_this, void 0, void 0, function () {
+        var invoice, response, updatedInvoice;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    invoice = new _1.Invoice(getMockInvoiceInfo());
+                    invoiceDatabase.push(invoice);
+                    // mock get invoice response
+                    mockServer.onGet(/invoice/).reply(HttpStatus.OK, {
+                        ok: true,
+                        invoice: getMockInvoiceInfo({
+                            status: _1.PiixpayInvoiceStatus.F,
+                            received_coin: invoice.due.coin * 2,
+                        }),
+                    });
+                    return [4 /*yield*/, server.post("/payment/handle-payment").send({
+                            transaction_key: invoice.transactionKey,
+                        })];
+                case 1:
+                    response = _a.sent();
+                    expect(response.status).toEqual(HttpStatus.OK);
+                    expect(response.text).toMatchSnapshot();
+                    updatedInvoice = invoiceDatabase[0];
+                    expect(updatedInvoice.isPaid).toBe(true);
+                    expect(updatedInvoice.isComplete).toBe(true);
+                    expect(updatedInvoice.paymentStatus).toBe(_1.InvoicePaymentStatus.FULL);
+                    expect(updatedInvoice.amountStatus).toBe(_1.InvoiceAmountStatus.OVERPAID);
+                    expect(processInvoicesDatabaseForSnapshot(invoiceDatabase)).toMatchSnapshot();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
     it("should return bad request if the transaction key is missing", function () { return __awaiter(_this, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {
@@ -277,12 +308,20 @@ function saveInvoice(invoice) {
         });
     });
 }
-function processInvoicesDatabaseForSnapshot(invoices) {
-    invoices.forEach(Piixpay_test_1.processInvoiceForSnapshot);
-    return invoices;
-}
 function getMockInvoiceInfo(override) {
     if (override === void 0) { override = {}; }
     return __assign({ transaction_key: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", status: _1.PiixpayInvoiceStatus.N, status_time: "2018-05-15 15:51:05 +00:00", status_utime: 1526399465, created_time: "2018-05-15 14:10:26 +00:00", created_utime: 1526393426, receiver_name: "Dag University", receiver_address: null, receiver_iban: "DA12345EFAEJBF242424524", coin: _1.Coin.BTC, sum_eur: 5, total_eur: 30.05, total_btc: 0.0043, fees_eur: 0.05, fees_btc: 0.0001, bank_fees_eur: 25, bank_fees_btc: 0.0035, received_btc: 0, missing_btc: 0.0043, rate: 7325.43, bitcoin_address: "iURIGqIuMNu2W2H89jOqqXmbu3RmdBz5", description: "Test payment", reference: null, contact_email: "test@example.com", contact_phone: null, contact_language: "", payer_name: "John Rambo", payer_document: "019ae981-713f-4eb8-860f-c11d48f29a1c", due_date: null, qrc_image_url: "https://www.piix.eu/web/qr/wvmvw317lls3j9wag68sntztw2wvnauw/code.jpg", qrc_endpoint_url: "http://www.piix.eu/web/qr/wvmvw317lls3j9wag68sntztw2wvnauw/redirect/", payment_url: "bitcoin://iURIGqIuMNu2W2H89jOqqXmbu3RmdBz5?amount=0.00430000", total_coin: 0.0043, fees_coin: 0.0001, bank_fees_coin: 0.0035, received_coin: 0, missing_coin: 0.0043, coin_address: "iURIGqIuMNu2W2H89jOqqXmbu3RmdBz5" }, override);
 }
+exports.getMockInvoiceInfo = getMockInvoiceInfo;
+function processInvoiceForSnapshot(invoice) {
+    invoice.info.created_time = new Date(0).toISOString();
+    invoice.info.status_time = new Date(0).toISOString();
+    return invoice;
+}
+exports.processInvoiceForSnapshot = processInvoiceForSnapshot;
+function processInvoicesDatabaseForSnapshot(invoices) {
+    invoices.forEach(processInvoiceForSnapshot);
+    return invoices;
+}
+exports.processInvoicesDatabaseForSnapshot = processInvoicesDatabaseForSnapshot;
 //# sourceMappingURL=middleware.test.js.map

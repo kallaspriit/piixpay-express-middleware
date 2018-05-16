@@ -38,13 +38,9 @@ var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = require("axios");
 var axios_mock_adapter_1 = require("axios-mock-adapter");
-// import * as HttpStatus from "http-status-codes";
-// import { ILogger } from "ts-log";
-// const CALLBACK_URL = "https://example.com";
-// const RECEIVING_ADDRESS = "2FupTEd3PDF7HVxNrzNqQGGoWZA4rqiphq";
-// const API_KEY = "xxx";
-// const XPUB = "yyy";
-// const SECRET = "zzz";
+var HttpStatus = require("http-status-codes");
+var index_1 = require("./index");
+var middleware_test_1 = require("./middleware.test");
 var mockServer;
 describe("Blockchain", function () {
     beforeEach(function () {
@@ -59,78 +55,250 @@ describe("Blockchain", function () {
             return [2 /*return*/];
         });
     }); });
-    // it("should generate a new receiving address", async () => {
-    //   mockServer.onGet(/receive/).reply(HttpStatus.OK, {
-    //     address: RECEIVING_ADDRESS,
-    //     index: 0,
-    //     callback: CALLBACK_URL,
-    //   });
-    //   const blockchain = new Piixpay({
-    //     apiKey: API_KEY,
-    //     xPub: XPUB,
-    //   });
-    //   const receivingAddress = await blockchain.generateReceivingAddress(CALLBACK_URL);
-    //   expect(receivingAddress).toMatchSnapshot();
-    // });
-    // it("should throw error when generating receving address and getting a non 2xx response", async () => {
-    //   mockServer.onGet(/receive/).reply(HttpStatus.BAD_REQUEST, "Bad request");
-    //   const blockchain = new Piixpay({
-    //     apiKey: API_KEY,
-    //     xPub: XPUB,
-    //     gapLimit: 20, // we can provide custom gap limit
-    //   });
-    //   await expect(blockchain.generateReceivingAddress(CALLBACK_URL)).rejects.toMatchSnapshot();
-    // });
-    // it("should create a new invoice with receiving address", async () => {
-    //   mockServer.onGet(/receive/).reply(HttpStatus.OK, {
-    //     address: RECEIVING_ADDRESS,
-    //     index: 0,
-    //     callback: CALLBACK_URL,
-    //   });
-    //   const blockchain = new Piixpay({
-    //     apiKey: API_KEY,
-    //     xPub: XPUB,
-    //   });
-    //   const invoice = await blockchain.createInvoice({
-    //     dueAmount: 1,
-    //     message: "Test invoice",
-    //     secret: SECRET,
-    //     callbackUrl: CALLBACK_URL,
-    //   });
-    //   expect(processInvoiceForSnapshot(invoice)).toMatchSnapshot();
-    // });
-    // it("should accept custom logger", async () => {
-    //   mockServer.onGet(/receive/).reply(HttpStatus.OK, {
-    //     address: RECEIVING_ADDRESS,
-    //     index: 0,
-    //     callback: CALLBACK_URL,
-    //   });
-    //   const mockLogger: ILogger = {
-    //     trace: jest.fn(),
-    //     debug: jest.fn(),
-    //     info: jest.fn(),
-    //     warn: jest.fn(),
-    //     error: jest.fn(),
-    //   };
-    //   const blockchain = new Piixpay(
-    //     {
-    //       apiKey: API_KEY,
-    //       xPub: XPUB,
-    //     },
-    //     mockLogger,
-    //   );
-    //   await blockchain.createInvoice({
-    //     dueAmount: 2.5,
-    //     message: "Another invoice",
-    //     secret: SECRET,
-    //     callbackUrl: CALLBACK_URL,
-    //   });
-    //   // tslint:disable-next-line:no-any
-    //   expect((mockLogger.info as any).mock.calls).toMatchSnapshot();
-    // });
+    it("should create a new invoice", function () { return __awaiter(_this, void 0, void 0, function () {
+        var blockchain, invoice;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    mockServer.onPost(/invoice/).reply(HttpStatus.OK, {
+                        ok: true,
+                        invoice: middleware_test_1.getMockInvoiceInfo(),
+                    });
+                    blockchain = new index_1.Piixpay({
+                        key: "xxx",
+                    });
+                    return [4 /*yield*/, blockchain.createInvoice({
+                            sum_eur: 5,
+                            description: "Test",
+                            payer_name: "John Rambo",
+                            payer_document: "123456",
+                            contact_email: "john@rambo.com",
+                        })];
+                case 1:
+                    invoice = _a.sent();
+                    expect(middleware_test_1.processInvoiceForSnapshot(invoice)).toMatchSnapshot();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it("should throw error if crating invoice failed", function () { return __awaiter(_this, void 0, void 0, function () {
+        var blockchain;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    mockServer.onPost(/invoice/).reply(HttpStatus.OK, {
+                        ok: false,
+                        error: "creating invoice failed",
+                        desc: "internal error occured",
+                    });
+                    blockchain = new index_1.Piixpay({
+                        key: "xxx",
+                    });
+                    return [4 /*yield*/, expect(blockchain.createInvoice({
+                            sum_eur: 5,
+                            description: "Test",
+                            payer_name: "John Rambo",
+                            payer_document: "123456",
+                            contact_email: "john@rambo.com",
+                        })).rejects.toMatchSnapshot()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it("should throw error when creating invoice if server returns error", function () { return __awaiter(_this, void 0, void 0, function () {
+        var blockchain;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    mockServer.onPost(/invoice/).reply(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+                    blockchain = new index_1.Piixpay({
+                        key: "xxx",
+                    });
+                    return [4 /*yield*/, expect(blockchain.createInvoice({
+                            sum_eur: 5,
+                            description: "Test",
+                            payer_name: "John Rambo",
+                            payer_document: "123456",
+                            contact_email: "john@rambo.com",
+                        })).rejects.toMatchSnapshot()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it("should return invoice info", function () { return __awaiter(_this, void 0, void 0, function () {
+        var blockchain, invoice;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    mockServer.onGet(/invoice/).reply(HttpStatus.OK, {
+                        ok: true,
+                        invoice: middleware_test_1.getMockInvoiceInfo(),
+                    });
+                    blockchain = new index_1.Piixpay({
+                        key: "xxx",
+                    });
+                    return [4 /*yield*/, blockchain.getInvoice("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")];
+                case 1:
+                    invoice = _a.sent();
+                    expect(middleware_test_1.processInvoiceForSnapshot(invoice)).toMatchSnapshot();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it("should throw if getting invoice info fails", function () { return __awaiter(_this, void 0, void 0, function () {
+        var blockchain;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    mockServer.onGet(/invoice/).reply(HttpStatus.OK, {
+                        ok: false,
+                        error: "getting invoice failed",
+                        desc: "invoice not found",
+                    });
+                    blockchain = new index_1.Piixpay({
+                        key: "xxx",
+                    });
+                    return [4 /*yield*/, expect(blockchain.getInvoice("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")).rejects.toMatchSnapshot()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it("should throw if server returns error", function () { return __awaiter(_this, void 0, void 0, function () {
+        var blockchain;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    mockServer.onGet(/invoice/).reply(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+                    blockchain = new index_1.Piixpay({
+                        key: "xxx",
+                    });
+                    return [4 /*yield*/, expect(blockchain.getInvoice("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")).rejects.toMatchSnapshot()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it("should accept query parameters for get", function () { return __awaiter(_this, void 0, void 0, function () {
+        var _this = this;
+        var blockchain, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    mockServer.onGet(/example/).reply(function (config) { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            return [2 /*return*/, [
+                                    HttpStatus.OK,
+                                    {
+                                        config: config,
+                                        ok: true,
+                                    },
+                                ]];
+                        });
+                    }); });
+                    blockchain = new index_1.Piixpay({
+                        key: "xxx",
+                    });
+                    return [4 /*yield*/, blockchain.get("http://example.com", { foo: "bar" })];
+                case 1:
+                    response = _a.sent();
+                    expect(response.config.url).toEqual("http://example.com?foo=bar");
+                    expect(response).toMatchSnapshot();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it("should accept query parameters for post", function () { return __awaiter(_this, void 0, void 0, function () {
+        var _this = this;
+        var blockchain, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    mockServer.onPost(/example/).reply(function (config) { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            return [2 /*return*/, [
+                                    HttpStatus.OK,
+                                    {
+                                        config: config,
+                                        ok: true,
+                                    },
+                                ]];
+                        });
+                    }); });
+                    blockchain = new index_1.Piixpay({
+                        key: "xxx",
+                    });
+                    return [4 /*yield*/, blockchain.post("http://example.com", { foo: "bar" }, { bar: "foo" })];
+                case 1:
+                    response = _a.sent();
+                    expect(response.config.url).toEqual("http://example.com?bar=foo");
+                    expect(response).toMatchSnapshot();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it("should accept custom logger", function () { return __awaiter(_this, void 0, void 0, function () {
+        var mockLogger, blockchain;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    mockServer.onGet(/rate/).reply(HttpStatus.OK, {
+                        ok: true,
+                        coins: {
+                            BTC: {
+                                coin: "BTC",
+                                name: "Bitcoin",
+                                rate_eur: 7323.08,
+                                rate_utctime: "2018-05-15 14:00:02",
+                                rate_utime: 1526392802,
+                            },
+                            LTC: {
+                                coin: "LTC",
+                                name: "Litecoin",
+                                rate_eur: 121.8,
+                                rate_utctime: "2018-05-15 14:00:03",
+                                rate_utime: 1526392803,
+                            },
+                            BCH: {
+                                coin: "BCH",
+                                name: "Bitcoin Cash",
+                                rate_eur: 1180.2,
+                                rate_utctime: "2018-05-15 14:00:04",
+                                rate_utime: 1526392804,
+                            },
+                            DASH: {
+                                coin: "DASH",
+                                name: "Dash",
+                                rate_eur: 368.43,
+                                rate_utctime: "2018-05-15 14:00:05",
+                                rate_utime: 1526392805,
+                            },
+                        },
+                    });
+                    mockLogger = {
+                        trace: jest.fn(),
+                        debug: jest.fn(),
+                        info: jest.fn(),
+                        warn: jest.fn(),
+                        error: jest.fn(),
+                    };
+                    blockchain = new index_1.Piixpay({
+                        key: "xxx",
+                    }, mockLogger);
+                    return [4 /*yield*/, blockchain.getRates()];
+                case 1:
+                    _a.sent();
+                    // tslint:disable-next-line:no-any
+                    expect(mockLogger.debug.mock.calls[0][0].response).toMatchSnapshot();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
 });
-function processInvoiceForSnapshot(invoice) {
-    return invoice;
-}
-exports.processInvoiceForSnapshot = processInvoiceForSnapshot;
 //# sourceMappingURL=Piixpay.test.js.map

@@ -115,15 +115,6 @@ var Piixpay = /** @class */ (function () {
         this.config = __assign({ baseUrl: "https://applib.net/piix/api" }, userConfig);
     }
     /**
-     * Returns status enumeration key name by value.
-     *
-     * @param statusValue Status enumeration value
-     */
-    Piixpay.getStatusByValue = function (statusValue) {
-        var keys = Object.keys(PiixpayInvoiceStatus);
-        return keys.find(function (statusKey) { return PiixpayInvoiceStatus[statusKey] === statusValue; });
-    };
-    /**
      * Returns rates.
      */
     Piixpay.prototype.getRates = function () {
@@ -143,7 +134,7 @@ var Piixpay = /** @class */ (function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.get("/merc/" + this.config.key + "/invoice/add", __assign({}, info))];
+                    case 0: return [4 /*yield*/, this.post("/merc/" + this.config.key + "/invoice/add", __assign({}, info))];
                     case 1:
                         response = _a.sent();
                         if (!response.ok) {
@@ -186,7 +177,6 @@ var Piixpay = /** @class */ (function () {
      * @param options Optional axios options
      */
     Piixpay.prototype.request = function (url, method, data, options) {
-        if (method === void 0) { method = RequestMethod.GET; }
         if (options === void 0) { options = {}; }
         return __awaiter(this, void 0, void 0, function () {
             var startTime, response, timeTaken, error_1;

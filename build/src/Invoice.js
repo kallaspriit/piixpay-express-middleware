@@ -304,6 +304,8 @@ var Invoice = /** @class */ (function () {
             received: this.received,
             rate: this.rate,
             paymentUrl: this.paymentUrl,
+            createdDate: this.createdDate,
+            updatedDate: this.updatedDate,
         };
     };
     return Invoice;

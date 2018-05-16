@@ -68,6 +68,13 @@ app.get("/", async (_request, response, _next) => {
   response.send(`
     <h1>Piixpay gateway</h1>
 
+    <p>
+      <strong>Piixpay.com payments API express middleware</strong>
+    </p>
+    <p>
+      <a href="https://github.com/kallaspriit/piixpay-express-middleware" target="_blank">View on Github</a>
+    </p>
+
     <h2>Request payment</h2>
     <form method="post" action="/pay">
       <p>

@@ -86,18 +86,18 @@ export interface IRatesResponse extends ICommonResponse {
  * Create invoice request parameters.
  */
 export interface ICreateInvoiceRequest {
+    sum_eur: number;
+    description: string;
+    payer_name: string;
+    payer_document: string;
+    contact_email: string;
     receiver_name?: string;
     receiver_address?: string;
     receiver_iban?: string;
-    sum_eur: number;
     coin?: Coin;
-    description: string;
     reference?: string;
-    contact_email: string;
     contact_phone?: string;
     contact_language?: string;
-    payer_name: string;
-    payer_document: string;
     due_date?: string;
 }
 /**
@@ -173,12 +173,6 @@ export default class Piixpay {
      */
     constructor(userConfig: IPiixpayConfig, log?: ILogger);
     /**
-     * Returns status enumeration key name by value.
-     *
-     * @param statusValue Status enumeration value
-     */
-    static getStatusByValue(statusValue: PiixpayInvoiceStatus): keyof typeof PiixpayInvoiceStatus | undefined;
-    /**
      * Returns rates.
      */
     getRates(): Promise<IRatesResponse>;
@@ -204,7 +198,7 @@ export default class Piixpay {
      * @param data Optional payload data
      * @param options Optional axios options
      */
-    request<T>(url: string, method?: RequestMethod, data?: object, options?: AxiosRequestConfig): Promise<T>;
+    request<T>(url: string, method: RequestMethod, data?: object, options?: AxiosRequestConfig): Promise<T>;
     /**
      * Makes a GET request.
      *

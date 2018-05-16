@@ -95,18 +95,18 @@ export interface IRatesResponse extends ICommonResponse {
  * Create invoice request parameters.
  */
 export interface ICreateInvoiceRequest {
+  sum_eur: number;
+  description: string;
+  payer_name: string;
+  payer_document: string;
+  contact_email: string;
   receiver_name?: string;
   receiver_address?: string;
   receiver_iban?: string;
-  sum_eur: number;
   coin?: Coin;
-  description: string;
   reference?: string;
-  contact_email: string;
   contact_phone?: string;
   contact_language?: string;
-  payer_name: string;
-  payer_document: string;
   due_date?: string;
 }
 
@@ -192,17 +192,6 @@ export default class Piixpay {
   }
 
   /**
-   * Returns status enumeration key name by value.
-   *
-   * @param statusValue Status enumeration value
-   */
-  public static getStatusByValue(statusValue: PiixpayInvoiceStatus): keyof typeof PiixpayInvoiceStatus | undefined {
-    const keys = Object.keys(PiixpayInvoiceStatus) as Array<keyof typeof PiixpayInvoiceStatus>;
-
-    return keys.find(statusKey => PiixpayInvoiceStatus[statusKey] === statusValue);
-  }
-
-  /**
    * Returns rates.
    */
   public async getRates(): Promise<IRatesResponse> {
@@ -215,7 +204,7 @@ export default class Piixpay {
    * @param info Invoice info
    */
   public async createInvoice(info: ICreateInvoiceRequest): Promise<Invoice> {
-    const response = await this.get<ICreateInvoiceResponse>(`/merc/${this.config.key}/invoice/add`, {
+    const response = await this.post<ICreateInvoiceResponse>(`/merc/${this.config.key}/invoice/add`, {
       // session_key: this.sessionKey,
       ...info,
     });
@@ -254,7 +243,7 @@ export default class Piixpay {
    */
   public async request<T>(
     url: string,
-    method = RequestMethod.GET,
+    method: RequestMethod,
     data?: object,
     options: AxiosRequestConfig = {},
   ): Promise<T> {

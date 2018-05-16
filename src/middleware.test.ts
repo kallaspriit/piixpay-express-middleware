@@ -15,7 +15,6 @@ import middleware, {
   Piixpay,
   PiixpayInvoiceStatus,
 } from "./";
-import { processInvoiceForSnapshot } from "./Piixpay.test";
 
 // invoices "database" emulated with a simple array
 const invoiceDatabase: Invoice[] = [];
@@ -241,13 +240,7 @@ async function saveInvoice(invoice: Invoice): Promise<void> {
   }
 }
 
-function processInvoicesDatabaseForSnapshot(invoices: Invoice[]): Invoice[] {
-  invoices.forEach(processInvoiceForSnapshot);
-
-  return invoices;
-}
-
-function getMockInvoiceInfo(override: Partial<IInvoiceInfo> = {}): IInvoiceInfo {
+export function getMockInvoiceInfo(override: Partial<IInvoiceInfo> = {}): IInvoiceInfo {
   return {
     transaction_key: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     status: PiixpayInvoiceStatus.N, // new
@@ -289,4 +282,17 @@ function getMockInvoiceInfo(override: Partial<IInvoiceInfo> = {}): IInvoiceInfo 
     coin_address: "iURIGqIuMNu2W2H89jOqqXmbu3RmdBz5",
     ...override,
   };
+}
+
+export function processInvoiceForSnapshot(invoice: Invoice): Invoice {
+  invoice.info.created_time = new Date(0).toISOString();
+  invoice.info.status_time = new Date(0).toISOString();
+
+  return invoice;
+}
+
+export function processInvoicesDatabaseForSnapshot(invoices: Invoice[]): Invoice[] {
+  invoices.forEach(processInvoiceForSnapshot);
+
+  return invoices;
 }

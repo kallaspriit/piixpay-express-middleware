@@ -50,7 +50,7 @@ export declare type InvoiceUpdateCallback = (error: Error | null, info?: Invoice
  * Represents an invoice.
  */
 export default class Invoice {
-    private readonly info;
+    readonly info: IInvoiceInfo;
     /**
      * Constructs the invoice.
      *
@@ -196,5 +196,7 @@ export default class Invoice {
         };
         rate: number;
         paymentUrl: string;
+        createdDate: Date;
+        updatedDate: Date;
     };
 }
