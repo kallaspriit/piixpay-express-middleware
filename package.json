@@ -1,6 +1,6 @@
 {
   "name": "piixpay-express-middleware",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "piixpay.com receive payments API express middleware",
   "main": "build/src/index.js",
   "repository": "git@github.com:kallaspriit/piixpay-express-middleware.git",
